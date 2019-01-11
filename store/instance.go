@@ -61,6 +61,9 @@ type SetTx interface {
 	// This will include when the item is soft deleted.
 	LastUpdate() time.Time
 
+	// Partition on where this transaction belongs to.
+	Partition() Partition
+
 	// IsSoftDeleted the item.
 	IsSoftDeleted() bool
 

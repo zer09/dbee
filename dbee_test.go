@@ -254,6 +254,15 @@ var _ = Describe("dbee", func() {
 				})
 			})
 
+			Context("partition access", func() {
+				It("willl verify the default partition", func() {
+					set, _ := i.Set("set")
+					setTx, _ := set.Get()
+
+					Expect(setTx.Partition().Name()).
+						Should(BeEquivalentTo("default"))
+				})
+			})
 		}
 	})
 })

@@ -2,6 +2,7 @@ package boltengine
 
 import (
 	"dbee/internal/boltengine/schema"
+	"dbee/store"
 	"time"
 
 	proto "github.com/golang/protobuf/proto"
@@ -14,7 +15,7 @@ type SetTx struct {
 	id         ulid.ULID
 	idBuf      []byte
 	set        *Set
-	partition       *partition
+	partition  *partition
 	payload    *schema.Payload
 	payloadBuf []byte
 	err        error
@@ -40,6 +41,10 @@ func (sx *SetTx) LastUpdate() (t time.Time) {
 
 	t, sx.err = ptypes.Timestamp(sx.payload.Meta.LastUpdate)
 	return t
+}
+
+func (sx *SetTx) Partition() store.Partition {
+	return sx.partition
 }
 
 func (sx *SetTx) IsSoftDeleted() bool {
