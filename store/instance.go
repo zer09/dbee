@@ -28,13 +28,26 @@ type Set interface {
 	// Partitions list.
 	Partitions() []string
 
+	// Partition will get a partition by name.
+	Partition(name string) (Partition, error)
+
 	// Get set transaction
-	// The param will accept to paramater, the first will be the
-	// Id but dont provide id by your own, the should come from
-	// other transaction otherwise leave it empty. The second
-	// paramater is the partition name this is also optianal,
-	// if left empty it will use the default partition.
-	Get(param ...string) (SetTx, error)
+	// The id is optional and will a SetTx id, that was auto generated.
+	// If you provide the id, it means that the data is already existed,
+	// otherwise just leave it and it will be treated as a new data.
+	// This will use the default partition.
+	Get(id ...string) (SetTx, error)
+}
+
+type Partition interface {
+	// Name of the partition
+	Name() string
+
+	// Get set transaction
+	// The id is optional and will a SetTx id, that was auto generated.
+	// If you provide the id, it means that the data is already existed,
+	// otherwise just leave it and it will be treated as a new data.
+	Get(id ...string) (SetTx, error)
 }
 
 type SetTx interface {

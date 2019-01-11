@@ -14,7 +14,7 @@ type SetTx struct {
 	id         ulid.ULID
 	idBuf      []byte
 	set        *Set
-	partition  string
+	partition       *partition
 	payload    *schema.Payload
 	payloadBuf []byte
 	err        error
@@ -73,7 +73,7 @@ func (sx *SetTx) HardDelete() error {
 		return sx.err
 	}
 
-	sx.err = sx.set.partitions[sx.partition].store.Update(func(tx *bolt.Tx) error {
+	sx.err = sx.partition.store.Update(func(tx *bolt.Tx) error {
 		return tx.Bucket(rootBucket).Delete(sx.idBuf)
 	})
 
@@ -101,7 +101,7 @@ func (sx *SetTx) Commit() error {
 		return sx.err
 	}
 
-	sx.err = sx.set.partitions[sx.partition].store.Update(func(tx *bolt.Tx) error {
+	sx.err = sx.partition.store.Update(func(tx *bolt.Tx) error {
 		return tx.Bucket(rootBucket).Put(sx.idBuf, sx.payloadBuf)
 	})
 
@@ -114,7 +114,7 @@ func (sx *SetTx) loadPayload() error {
 		return sx.err
 	}
 
-	sx.err = sx.set.partitions[sx.partition].store.View(func(tx *bolt.Tx) error {
+	sx.err = sx.partition.store.View(func(tx *bolt.Tx) error {
 		sx.payloadBuf = tx.Bucket(rootBucket).Get(sx.idBuf)
 		if sx.payloadBuf != nil {
 			return proto.Unmarshal(sx.payloadBuf, sx.payload)

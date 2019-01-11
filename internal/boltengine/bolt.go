@@ -227,9 +227,10 @@ func (i *Instance) Set(name string) (store.Set, error) {
 			}
 
 			s.partitions[defPart.Name] = &partition{
-				Name:  defPart.Name,
-				Index: defPart.Index,
-				Store: defPart.Store,
+				name:      defPart.Name,
+				indexName: defPart.Index,
+				storeName: defPart.Store,
+				set:       s,
 			}
 
 			return b.Put(pBuf, setBuf)
@@ -242,9 +243,10 @@ func (i *Instance) Set(name string) (store.Set, error) {
 
 			for _, defPart := range setSchema.Partition {
 				s.partitions[defPart.Name] = &partition{
-					Name:  defPart.Name,
-					Index: defPart.Index,
-					Store: defPart.Store,
+					name:      defPart.Name,
+					indexName: defPart.Index,
+					storeName: defPart.Store,
+					set:       s,
 				}
 			}
 		}
@@ -260,11 +262,11 @@ func (i *Instance) Set(name string) (store.Set, error) {
 
 	for _, v := range s.partitions {
 		v.opened = true
-		if v.index, err = open(filepath.Join(s.dir, v.Index)); err != nil {
+		if v.index, err = open(filepath.Join(s.dir, v.indexName)); err != nil {
 			return nil, err
 		}
 
-		if v.store, err = open(filepath.Join(s.dir, v.Store)); err != nil {
+		if v.store, err = open(filepath.Join(s.dir, v.storeName)); err != nil {
 			return nil, err
 		}
 	}
