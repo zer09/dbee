@@ -1,0 +1,12 @@
+syntax = "proto3";
+package schema;
+
+message Set {
+  repeated Partition partition = 1;
+}
+
+message Partition {
+  string name = 1;
+  string index = 2;
+  string store = 3;
+}
