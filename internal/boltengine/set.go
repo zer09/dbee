@@ -5,6 +5,7 @@ import (
 	"dbee/internal/boltengine/schema"
 	"dbee/store"
 	"path/filepath"
+	"reflect"
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/oklog/ulid"
@@ -17,6 +18,8 @@ type Set struct {
 	name string
 	// partitions of the set.
 	partitions map[string]*partition
+	// List of all indexed
+	idxs map[string]struct{}
 }
 
 func (s *Set) Name() string {
@@ -35,6 +38,25 @@ func (s *Set) Partitions() []string {
 
 func (s *Set) Partition(name string) (store.Partition, error) {
 	return s.getPartition(name)
+}
+
+func (s *Set) Index(propName string) error {
+	idx, err := s.newIDx(propName, s)
+	if err == nil {
+		s.idxs[idx] = empty
+	}
+
+	return err
+}
+
+func (s *Set) ListIndexes() []string {
+	keys := reflect.ValueOf(s.idxs).MapKeys()
+	ks := make([]string, len(keys))
+	for i := 0; i < len(keys); i++ {
+		ks[i] = keys[i].String()
+	}
+
+	return ks
 }
 
 func (s *Set) Get(id ...string) (store.SetTx, error) {

@@ -31,6 +31,18 @@ type Set interface {
 	// Partition will get a partition by name.
 	Partition(name string) (Partition, error)
 
+	// Index will create an index for the set.
+	// propName will be the name of the property.
+	// Every partition will have it's own indexing.
+	// for example if you index the property of name, then all name property
+	// created on partition 1 will on partition 1.
+	// If the property is index after there is already data, then the index will
+	// re-scan the set to find data to be indexed.
+	Index(propName string) error
+
+	// ListIndexes will list all indexed property.
+	ListIndexes() []string
+
 	// Get set transaction
 	// The id is optional and will a SetTx id, that was auto generated.
 	// If you provide the id, it means that the data is already existed,

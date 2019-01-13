@@ -7,6 +7,7 @@ import (
 	"dbee/internal/boltengine/schema"
 	"dbee/store"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/gogo/protobuf/proto"
@@ -27,6 +28,8 @@ var (
 	sets = []byte("sets")
 	// rootBucket of the store
 	rootBucket = endian.I64toB(0)
+	// empty will be used for map values that dont need values.
+	empty struct{}
 )
 
 // boltOpt the default option for bolt.
@@ -35,6 +38,7 @@ var boltOpt = &bolt.Options{Timeout: 1 * time.Second}
 // metaMagicName is the magic file name of the meta information.
 const metaMagicName string = "01CRZFW6MBXA18393078QPCDQ7"
 const defaultPartition string = "default"
+const indexBucketPrefix = "idx_"
 
 func open(path string) (*bolt.DB, error) {
 	return bolt.Open(path, 0600, boltOpt)
@@ -271,5 +275,49 @@ func (i *Instance) Set(name string) (store.Set, error) {
 		}
 	}
 
+	i.getIDxs(s)
 	return s, s.preparRootBucket()
+}
+
+// newIDx will add new index for the set.
+// will return cleaned up string and error if there is any.
+func (i *Instance) newIDx(propName string, set *Set) (string, error) {
+	setIdx := indexBucketPrefix + set.name
+	idxStr := strings.ToLower(strings.TrimSpace(propName))
+	idx := []byte(idxStr)
+
+	return idxStr, i.meta.Update(func(tx *bolt.Tx) error {
+		b, err := tx.CreateBucketIfNotExists([]byte(setIdx))
+		if err != nil {
+			return err
+		}
+
+		exists := b.Get(idx)
+		if exists != nil {
+			return nil
+		}
+
+		return b.Put(idx, nil)
+	})
+}
+
+func (i *Instance) getIDxs(set *Set) {
+	setIdx := indexBucketPrefix + set.name
+
+	_ = i.meta.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(setIdx))
+		if b == nil {
+			set.idxs = make(map[string]struct{}, 0)
+			return nil
+		}
+
+		set.idxs = make(map[string]struct{}, b.Stats().KeyN)
+		c := b.Cursor()
+
+		for k, _ := c.First(); k != nil; k, _ = c.Next() {
+			set.idxs[string(k)] = empty
+		}
+
+		return nil
+	})
 }

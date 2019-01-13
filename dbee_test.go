@@ -401,6 +401,53 @@ var _ = Describe("dbee", func() {
 					Expect(setTx.Rint("int")).Should(BeNumerically("==", 0))
 				})
 			})
+
+			Context("Check indexing", func() {
+				idx := []string{
+					"index.first",
+					"index.second",
+					"index.third",
+					"username",
+				}
+
+				It("will check that the indexing is empty at first", func() {
+					set, _ := i.Set("set")
+					l := len(set.ListIndexes())
+
+					Expect(l).Should(BeNumerically("==", 0))
+				})
+
+				It("will setup a new index", func() {
+					set, _ := i.Set("set")
+
+					err = set.Index(idx[0])
+
+					Expect(err).NotTo(HaveOccurred())
+
+					_ = set.Index(idx[1])
+					_ = set.Index(idx[2])
+					_ = set.Index(idx[3])
+
+					l := len(set.ListIndexes())
+					Expect(l).Should(BeNumerically("==", 4))
+					Expect(set.ListIndexes()).Should(ConsistOf(idx))
+				})
+
+				It("will close the db and recheck the indexes", func() {
+					err = i.Close()
+					Expect(err).NotTo(HaveOccurred())
+
+					i, err = Open(dir, eng)
+					Expect(err).NotTo(HaveOccurred())
+
+					set, err := i.Set("set")
+					Expect(err).NotTo(HaveOccurred())
+
+					l := len(set.ListIndexes())
+					Expect(l).Should(BeNumerically("==", 4))
+					Expect(set.ListIndexes()).Should(ConsistOf(idx))
+				})
+			})
 		}
 	})
 })
