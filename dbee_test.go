@@ -88,7 +88,6 @@ var _ = Describe("dbee", func() {
 			})
 
 			Context("Creating sets", func() {
-				By("Will create sets and try to reopen it without timeout")
 				DescribeTable("Table for sets", func(n string) {
 					s, err := i.Set(n)
 
