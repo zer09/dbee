@@ -262,6 +262,144 @@ var _ = Describe("dbee", func() {
 					Expect(setTx.Partition().Name()).
 						Should(BeEquivalentTo("default"))
 				})
+
+				It("will create a new partition", func() {
+					set, _ := i.Set("set")
+					par, err := set.Partition("new partition")
+
+					Expect(err).NotTo(HaveOccurred())
+					Expect(par.Name()).Should(BeEquivalentTo("new partition"))
+				})
+
+				It("will create a new tx from the new partition", func() {
+					set, _ := i.Set("set")
+					par, _ := set.Partition("new partition")
+					setTx, err := par.Get()
+
+					Expect(err).NotTo(HaveOccurred())
+					Expect(len(setTx.ID())).Should(BeNumerically("==", 26))
+				})
+			})
+
+			Context("store and retrive data in the new partition", func() {
+				var setId string
+				pname := "new partition"
+
+				It("will store a new set", func() {
+					set, _ := i.Set("set")
+					p, _ := set.Partition(pname)
+					setTx, _ := p.Get()
+
+					setId = setTx.ID()
+
+					setTx.Wstring("sample", "sample string value")
+					setTx.Wstring("prop2", "sample string 2")
+
+					err = setTx.Commit()
+					Expect(err).NotTo(HaveOccurred())
+
+					sample := setTx.Rstring("sample")
+
+					prop2 := setTx.Rstring("prop2")
+
+					Expect(sample).Should(BeEquivalentTo("sample string value"))
+					Expect(prop2).Should(BeEquivalentTo("sample string 2"))
+				})
+
+				It("will retrive the data on id"+setId, func() {
+					set, _ := i.Set("set")
+					p, _ := set.Partition(pname)
+					setTx, _ := p.Get(setId)
+
+					sample := setTx.Rstring("sample")
+					prop2 := setTx.Rstring("prop2")
+
+					Expect(sample).Should(BeEquivalentTo("sample string value"))
+					Expect(prop2).Should(BeEquivalentTo("sample string 2"))
+				})
+
+				It("will test all the data type supported", func() {
+					set, _ := i.Set("set")
+					p, _ := set.Partition(pname)
+					setTx, _ := p.Get()
+
+					setId = setTx.ID()
+
+					setTx.Wfloat("float", 1)
+					setTx.Wdouble("double", 1)
+					setTx.Wint("int", 1)
+					setTx.Wsint("sint", 1)
+					setTx.Wuint("uint", 1)
+					setTx.Wbool("bool", true)
+					setTx.Wstring("string", "string")
+					setTx.Wbytes("bytes", []byte("byte"))
+
+					err = setTx.Commit()
+
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				It("will read all data type supported", func() {
+					set, _ := i.Set("set")
+					p, _ := set.Partition(pname)
+					setTx, _ := p.Get(setId)
+
+					Expect(setTx.Rfloat("float")).Should(BeNumerically("==", 1))
+					Expect(setTx.Rdouble("double")).Should(BeNumerically("==", 1))
+					Expect(setTx.Rint("int")).Should(BeNumerically("==", 1))
+					Expect(setTx.Rsint("sint")).Should(BeNumerically("==", 1))
+					Expect(setTx.Ruint("uint")).Should(BeNumerically("==", 1))
+					Expect(setTx.Rbool("bool")).Should(BeTrue())
+					Expect(setTx.Rstring("string")).Should(BeIdenticalTo("string"))
+					Expect(setTx.Rbytes("bytes")).Should(Equal([]byte("byte")))
+				})
+			})
+
+			Context("data deletion the new partition", func() {
+				var setId string
+
+				It("will a soft delete", func() {
+					set, _ := i.Set("set")
+					p, _ := set.Partition("new partition")
+					setTx, _ := p.Get()
+
+					setId = setTx.ID()
+					setTx.Wint("int", 1)
+					_ = setTx.Commit()
+
+					Expect(setTx.IsSoftDeleted()).Should(BeFalse())
+
+					setTx.Delete()
+
+					err = setTx.Commit()
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				It("will retrive the soft deleted entry", func() {
+					set, _ := i.Set("set")
+					p, _ := set.Partition("new partition")
+					setTx, _ := p.Get(setId)
+
+					Expect(setTx.IsSoftDeleted()).Should(BeTrue())
+					Expect(setTx.Rint("int")).Should(BeNumerically("==", 1))
+				})
+
+				It("will hard delete the data", func() {
+					set, _ := i.Set("set")
+					p, _ := set.Partition("new partition")
+					setTx, _ := p.Get(setId)
+					err = setTx.HardDelete()
+
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				It("will check if the data is hardly deleted", func() {
+					set, _ := i.Set("set")
+					p, _ := set.Partition("new partition")
+					setTx, _ := p.Get(setId)
+
+					Expect(setTx.Rint("int")).Should(BeNumerically("==", 0))
+				})
 			})
 		}
 	})
