@@ -286,21 +286,27 @@ func (i *Instance) Set(name string) (store.Set, error) {
 func (i *Instance) newIDx(propName string, set *Set) (string, error) {
 	setIdx := indexBucketPrefix + set.name
 	idxStr := strings.ToLower(strings.TrimSpace(propName))
-	idx := []byte(idxStr)
+	idxBuf := []byte(idxStr)
 
-	return idxStr, i.meta.Update(func(tx *bolt.Tx) error {
+	err := i.meta.Update(func(tx *bolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists([]byte(setIdx))
 		if err != nil {
 			return err
 		}
 
-		exists := b.Get(idx)
+		exists := b.Get(idxBuf)
 		if exists != nil {
 			return nil
 		}
 
-		return b.Put(idx, nil)
+		return b.Put(idxBuf, nil)
 	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return idxStr, err
 }
 
 func (i *Instance) getIDxs(set *Set) {
