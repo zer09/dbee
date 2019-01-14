@@ -19,11 +19,11 @@ import (
 var (
 	// props is the bucket that will store the propertiest/column.
 	props = []byte("props")
-	// prop_names is a bucket inside prop that will store property name as value.
-	prop_names = []byte("prop_names")
-	// prop_indexes is a bucket inside prop that will store property as key.
+	// propNames is a bucket inside prop that will store property name as value.
+	propNames = []byte("propNames")
+	// propIndexes is a bucket inside prop that will store property as key.
 	// And the value will be the index number of the property name.
-	prop_indexes = []byte("prop_indexes")
+	propIndexes = []byte("propIndexes")
 	// sets is the bucket that hold the set information.
 	sets = []byte("sets")
 	// rootBucket of the store
@@ -79,12 +79,12 @@ func New(dir string) (*Instance, error) {
 		if b, err := tx.CreateBucketIfNotExists(props); err != nil {
 			return err
 		} else {
-			_, err := b.CreateBucketIfNotExists(prop_names)
+			_, err := b.CreateBucketIfNotExists(propNames)
 			if err != nil {
 				return err
 			}
 
-			_, err = b.CreateBucketIfNotExists(prop_indexes)
+			_, err = b.CreateBucketIfNotExists(propIndexes)
 			if err != nil {
 				return err
 			}
@@ -141,7 +141,7 @@ func (i *Instance) GetPropName(index uint64) (string, error) {
 		return v, nil
 	} else {
 		err := i.meta.View(func(tx *bolt.Tx) error {
-			b := tx.Bucket(props).Bucket(prop_names)
+			b := tx.Bucket(props).Bucket(propNames)
 			name := b.Get(endian.I64toB(index))
 			if name != nil {
 				v = string(name)
@@ -164,7 +164,7 @@ func (i *Instance) GetPropIndex(name string) (uint64, error) {
 		return v, nil
 	} else {
 		_ = i.meta.View(func(tx *bolt.Tx) error {
-			b := tx.Bucket(props).Bucket(prop_indexes)
+			b := tx.Bucket(props).Bucket(propIndexes)
 			index := b.Get([]byte(name))
 			if index != nil {
 				v = endian.BtoI64(index)
@@ -175,7 +175,7 @@ func (i *Instance) GetPropIndex(name string) (uint64, error) {
 
 		if v < 1 {
 			err := i.meta.Update(func(tx *bolt.Tx) error {
-				b := tx.Bucket(props).Bucket(prop_names)
+				b := tx.Bucket(props).Bucket(propNames)
 				i, err := b.NextSequence()
 				if err != nil {
 					return err
@@ -188,7 +188,7 @@ func (i *Instance) GetPropIndex(name string) (uint64, error) {
 				}
 
 				v = i
-				return tx.Bucket(props).Bucket(prop_indexes).Put([]byte(name), id)
+				return tx.Bucket(props).Bucket(propIndexes).Put([]byte(name), id)
 			})
 
 			if err != nil {
