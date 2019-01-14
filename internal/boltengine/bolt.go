@@ -67,6 +67,11 @@ type indexMap struct {
 	index map[string]uint64
 }
 
+func (i *indexMap) indexable(propID uint64) bool {
+	_, ok := i.name[propID]
+	return ok
+}
+
 // New instance of Instance.
 func New(dir string) (*Instance, error) {
 	meta, err := open(filepath.Join(dir, metaMagicName))
