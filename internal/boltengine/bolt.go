@@ -7,7 +7,6 @@ import (
 	"dbee/internal/boltengine/schema"
 	"dbee/store"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/gogo/protobuf/proto"
@@ -158,7 +157,7 @@ func (i *Instance) GetPropName(index uint64) (string, error) {
 // GetPropIndex will get the property index using the property name.
 // If the name is not indexed then it will store the index and property name.
 func (i *Instance) GetPropIndex(name string) (uint64, error) {
-	name = strings.ToLower(strings.TrimSpace(name))
+	name = sanitizeProp(name)
 
 	if v, ok := i.props.index[name]; ok {
 		return v, nil
@@ -290,7 +289,7 @@ func (i *Instance) Set(name string) (store.Set, error) {
 // will return cleaned up string and error if there is any.
 func (i *Instance) newIDx(propName string, set *Set) error {
 	setIdx := indexBucketPrefix + set.name
-	idxStr := strings.ToLower(strings.TrimSpace(propName))
+	idxStr := sanitizeProp(propName)
 	idxBuf := []byte(idxStr)
 
 	err := i.meta.Update(func(tx *bolt.Tx) error {
