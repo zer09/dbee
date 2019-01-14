@@ -153,6 +153,8 @@ func (i *Instance) GetPropName(index uint64) (string, error) {
 // GetPropIndex will get the property index using the property name.
 // If the name is not indexed then it will store the index and property name.
 func (i *Instance) GetPropIndex(name string) (uint64, error) {
+	name = strings.ToLower(strings.TrimSpace(name))
+
 	if v, ok := i.props.index[name]; ok {
 		return v, nil
 	} else {
