@@ -63,6 +63,11 @@ type instanceProp struct {
 	index map[string]uint64
 }
 
+type indexMap struct {
+	name  map[uint64]string
+	index map[string]uint64
+}
+
 // New instance of Instance.
 func New(dir string) (*Instance, error) {
 	meta, err := open(filepath.Join(dir, metaMagicName))
@@ -283,7 +288,7 @@ func (i *Instance) Set(name string) (store.Set, error) {
 
 // newIDx will add new index for the set.
 // will return cleaned up string and error if there is any.
-func (i *Instance) newIDx(propName string, set *Set) (string, error) {
+func (i *Instance) newIDx(propName string, set *Set) error {
 	setIdx := indexBucketPrefix + set.name
 	idxStr := strings.ToLower(strings.TrimSpace(propName))
 	idxBuf := []byte(idxStr)
@@ -303,29 +308,53 @@ func (i *Instance) newIDx(propName string, set *Set) (string, error) {
 	})
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return idxStr, err
+	propID, err := i.GetPropIndex(idxStr)
+	if err != nil {
+		return err
+	}
+
+	set.idxs.name[propID] = idxStr
+	set.idxs.index[idxStr] = propID
+
+	return nil
 }
 
-func (i *Instance) getIDxs(set *Set) {
+func (i *Instance) getIDxs(set *Set) error {
 	setIdx := indexBucketPrefix + set.name
 
-	_ = i.meta.View(func(tx *bolt.Tx) error {
+	err := i.meta.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(setIdx))
 		if b == nil {
-			set.idxs = make(map[string]struct{}, 0)
+			set.idxs = &indexMap{
+				name:  make(map[uint64]string),
+				index: make(map[string]uint64),
+			}
 			return nil
 		}
 
-		set.idxs = make(map[string]struct{}, b.Stats().KeyN)
+		set.idxs = &indexMap{
+			name:  make(map[uint64]string, b.Stats().KeyN),
+			index: make(map[string]uint64, b.Stats().KeyN),
+		}
+
 		c := b.Cursor()
 
 		for k, _ := c.First(); k != nil; k, _ = c.Next() {
-			set.idxs[string(k)] = empty
+			idxStr := string(k)
+			propID, err := i.GetPropIndex(idxStr)
+			if err != nil {
+				return err
+			}
+
+			set.idxs.name[propID] = idxStr
+			set.idxs.index[idxStr] = propID
 		}
 
 		return nil
 	})
+
+	return err
 }

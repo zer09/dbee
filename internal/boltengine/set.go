@@ -19,7 +19,7 @@ type Set struct {
 	// partitions of the set.
 	partitions map[string]*partition
 	// List of all indexed
-	idxs map[string]struct{}
+	idxs *indexMap
 }
 
 func (s *Set) Name() string {
@@ -41,16 +41,11 @@ func (s *Set) Partition(name string) (store.Partition, error) {
 }
 
 func (s *Set) Index(propName string) error {
-	idx, err := s.newIDx(propName, s)
-	if err == nil {
-		s.idxs[idx] = empty
-	}
-
-	return err
+	return s.newIDx(propName, s)
 }
 
 func (s *Set) ListIndexes() []string {
-	keys := reflect.ValueOf(s.idxs).MapKeys()
+	keys := reflect.ValueOf(s.idxs.index).MapKeys()
 	ks := make([]string, len(keys))
 	for i := 0; i < len(keys); i++ {
 		ks[i] = keys[i].String()
