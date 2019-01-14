@@ -48,15 +48,15 @@ func open(path string) (*bolt.DB, error) {
 type Instance struct {
 	dir   string
 	meta  *bolt.DB
-	props *instanceProp
+	props *instancePropMap
 	// sets available sets for ths instace.
 	// set key name will be this formate setname:partition name,
 	// every set will be have a default name partition named `default`.
 	sets map[string]*Set
 }
 
-// instanceProp will hold the reverse index of property and property index.
-type instanceProp struct {
+// instancePropMap will hold the reverse index of property and property index.
+type instancePropMap struct {
 	// name will hold name as the value, and will be accessed using the index.
 	name map[uint64]string
 	// index will hold the index as value, and will be accessed using the prop.
@@ -104,7 +104,7 @@ func New(dir string) (*Instance, error) {
 	return &Instance{
 		dir:  dir,
 		meta: meta,
-		props: &instanceProp{
+		props: &instancePropMap{
 			name:  make(map[uint64]string),
 			index: make(map[string]uint64),
 		},
