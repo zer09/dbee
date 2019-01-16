@@ -278,6 +278,14 @@ var _ = Describe("dbee", func() {
 					Expect(err).NotTo(HaveOccurred())
 					Expect(len(setTx.ID())).Should(BeNumerically("==", 26))
 				})
+
+				It("will verify partitions", func() {
+					set, _ := i.Set("set")
+
+					partList := []string{"default", "new partition"}
+					Expect(len(set.Partitions())).Should(BeNumerically("==", 2))
+					Expect(set.Partitions()).Should(ConsistOf(partList))
+				})
 			})
 
 			Context("store and retrive data in the new partition", func() {
