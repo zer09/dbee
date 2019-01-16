@@ -164,44 +164,42 @@ func (i *Instance) GetPropName(index uint64) (string, error) {
 func (i *Instance) GetPropIndex(name string) (uint64, error) {
 	name = sanitizeProp(name)
 
+	var v uint64
 	if v, ok := i.props.index[name]; ok {
 		return v, nil
-	} else {
-		_ = i.meta.View(func(tx *bolt.Tx) error {
-			b := tx.Bucket(props).Bucket(propIndexes)
-			index := b.Get([]byte(name))
-			if index != nil {
-				v = endian.BtoI64(index)
-			}
+	}
 
+	err := i.meta.Update(func(tx *bolt.Tx) error {
+		propIdxBucket := tx.Bucket(props).Bucket(propIndexes)
+		index := propIdxBucket.Get([]byte(name))
+		if index != nil {
+			v = endian.BtoI64(index)
 			return nil
-		})
-
-		if v < 1 {
-			err := i.meta.Update(func(tx *bolt.Tx) error {
-				b := tx.Bucket(props).Bucket(propNames)
-				i, err := b.NextSequence()
-				if err != nil {
-					return err
-				}
-
-				id := endian.I64toB(i)
-				err = b.Put(id, []byte(name))
-				if err != nil {
-					return err
-				}
-
-				v = i
-				return tx.Bucket(props).Bucket(propIndexes).Put([]byte(name), id)
-			})
-
-			if err != nil {
-				return v, err
-			}
 		}
 
-		return v, nil
-	}
+		propNamesBucket := tx.Bucket(props).Bucket(propNames)
+		i, err := propNamesBucket.NextSequence()
+		if err != nil {
+			return err
+		}
+
+		id := endian.I64toB(i)
+		nameByte := []byte(name)
+		err = propNamesBucket.Put(id, nameByte)
+		if err != nil {
+			return err
+		}
+
+		err = propIdxBucket.Put(nameByte, id)
+		if err != nil {
+			return err
+		}
+
+		v = i
+		return nil
+	})
+
+	return v, nil
 }
 
 // Set will get an instance of set.
