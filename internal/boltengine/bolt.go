@@ -7,6 +7,7 @@ import (
 	"dbee/internal/boltengine/schema"
 	"dbee/store"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"github.com/gogo/protobuf/proto"
@@ -27,8 +28,6 @@ var (
 	sets = []byte("sets")
 	// rootBucket of the store
 	rootBucket = endian.I64toB(0)
-	// empty will be used for map values that dont need values.
-	empty struct{}
 )
 
 // boltOpt the default option for bolt.
@@ -37,7 +36,6 @@ var boltOpt = &bolt.Options{Timeout: 1 * time.Second}
 // metaMagicName is the magic file name of the meta information.
 const metaMagicName string = "01CRZFW6MBXA18393078QPCDQ7"
 const defaultPartition string = "default"
-const indexBucketPrefix = "idx_"
 
 func open(path string) (*bolt.DB, error) {
 	return bolt.Open(path, 0600, boltOpt)
@@ -48,9 +46,10 @@ type Instance struct {
 	dir   string
 	meta  *bolt.DB
 	props *instancePropMap
+	mux   sync.Mutex
 	// sets available sets for ths instace.
-	// set key name will be this formate setname:partition name,
-	// every set will be have a default name partition named `default`.
+	// set key name will be this formate setname:Partition name,
+	// every set will be have a default name Partition named `default`.
 	sets map[string]*Set
 }
 
@@ -60,16 +59,6 @@ type instancePropMap struct {
 	name map[uint64]string
 	// index will hold the index as value, and will be accessed using the prop.
 	index map[string]uint64
-}
-
-type indexMap struct {
-	name  map[uint64]string
-	index map[string]uint64
-}
-
-func (i *indexMap) indexable(propID uint64) bool {
-	_, ok := i.name[propID]
-	return ok
 }
 
 // New instance of Instance.
@@ -118,14 +107,16 @@ func New(dir string) (*Instance, error) {
 
 // Close the instance.
 func (i *Instance) Close() error {
+	i.mux.Lock()
+	defer i.mux.Unlock()
 	var err error
 	for _, v := range i.sets {
 		for _, p := range v.partitions {
-			if err = p.store.Close(); err != nil {
+			if err = p.index.Close(); err != nil {
 				return err
 			}
 
-			if err = p.index.Close(); err != nil {
+			if err = p.store.Close(); err != nil {
 				return err
 			}
 		}
@@ -199,68 +190,85 @@ func (i *Instance) GetPropIndex(name string) (uint64, error) {
 		return nil
 	})
 
-	return v, nil
+	return v, err
 }
 
 // Set will get an instance of set.
 // name is the name of the set.
 func (i *Instance) Set(name string) (store.Set, error) {
+	i.mux.Lock()
+	defer i.mux.Unlock()
+
 	if s, ok := i.sets[name]; ok {
 		return s, nil
 	}
 
 	s := &Set{
-		Instance:   i,
+		instance:   i,
 		name:       name,
-		partitions: make(map[string]*partition),
+		partitions: make(map[string]*Partition),
 	}
 
 	err := i.meta.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket(sets)
-		// pBuf the key of the set or the set name/name.
-		pBuf := []byte(s.name)
+		// kBuf the key of the set or the set name/name.
+		kBuf := []byte(s.name)
 		// sBuf is the schema.Set proto containing the meta of the set.
-		sBuf := b.Get(pBuf)
+		sBuf := b.Get(kBuf)
 
 		if sBuf == nil {
 			setSchema := &schema.Set{
-				Partition: make([]*schema.Partition, 1),
+				Partitions: make(map[string]*schema.Partition, 1),
 			}
 
-			defPart := &schema.Partition{
+			index, err := ulid.New(ulid.Now(), rand.Reader)
+			if err != nil {
+				return err
+			}
+
+			store, err := ulid.New(ulid.Now(), rand.Reader)
+			if err != nil {
+				return err
+			}
+
+			setSchema.Partitions[defaultPartition] = &schema.Partition{
 				Name:  defaultPartition,
-				Index: ulid.MustNew(ulid.Now(), rand.Reader).String(),
-				Store: ulid.MustNew(ulid.Now(), rand.Reader).String(),
+				Index: index.String(),
+				Store: store.String(),
 			}
 
-			setSchema.Partition[0] = defPart
 			setBuf, err := proto.Marshal(setSchema)
 			if err != nil {
 				return err
 			}
 
-			s.partitions[defPart.Name] = &partition{
-				name:      defPart.Name,
-				indexName: defPart.Index,
-				storeName: defPart.Store,
-				set:       s,
-			}
-
-			return b.Put(pBuf, setBuf)
-		} else {
-			setSchema := &schema.Set{}
-			err := proto.Unmarshal(sBuf, setSchema)
+			err = b.Put(kBuf, setBuf)
 			if err != nil {
 				return err
 			}
 
-			for _, defPart := range setSchema.Partition {
-				s.partitions[defPart.Name] = &partition{
-					name:      defPart.Name,
-					indexName: defPart.Index,
-					storeName: defPart.Store,
-					set:       s,
-				}
+			s.partitions[defaultPartition] = &Partition{
+				name:      defaultPartition,
+				indexName: index.String(),
+				storeName: store.String(),
+				set:       s,
+			}
+
+			return nil
+		}
+
+		setSchema := &schema.Set{}
+		err := proto.Unmarshal(sBuf, setSchema)
+		if err != nil {
+			return err
+		}
+
+		for k, v := range setSchema.Partitions {
+			s.partitions[k] = &Partition{
+				name:      v.Name,
+				indexName: v.Index,
+				storeName: v.Store,
+				set:       s,
 			}
 		}
 
@@ -274,89 +282,16 @@ func (i *Instance) Set(name string) (store.Set, error) {
 	i.sets[s.name] = s
 
 	for _, v := range s.partitions {
-		v.opened = true
-		if v.index, err = open(filepath.Join(s.dir, v.indexName)); err != nil {
-			return nil, err
-		}
-
-		if v.store, err = open(filepath.Join(s.dir, v.storeName)); err != nil {
-			return nil, err
-		}
-	}
-
-	i.getIDxs(s)
-	return s, s.preparRootBucket()
-}
-
-// newIDx will add new index for the set.
-// will return cleaned up string and error if there is any.
-func (i *Instance) newIDx(propName string, set *Set) error {
-	setIdx := indexBucketPrefix + set.name
-	idxStr := sanitizeProp(propName)
-	idxBuf := []byte(idxStr)
-
-	err := i.meta.Update(func(tx *bolt.Tx) error {
-		b, err := tx.CreateBucketIfNotExists([]byte(setIdx))
+		err = openPartition(v, s.instance.dir)
 		if err != nil {
-			return err
+			return nil, err
 		}
-
-		exists := b.Get(idxBuf)
-		if exists != nil {
-			return nil
-		}
-
-		return b.Put(idxBuf, nil)
-	})
-
-	if err != nil {
-		return err
 	}
 
-	propID, err := i.GetPropIndex(idxStr)
+	err = s.initIdxs()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	set.idxs.name[propID] = idxStr
-	set.idxs.index[idxStr] = propID
-
-	return nil
-}
-
-func (i *Instance) getIDxs(set *Set) error {
-	setIdx := indexBucketPrefix + set.name
-
-	err := i.meta.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(setIdx))
-		if b == nil {
-			set.idxs = &indexMap{
-				name:  make(map[uint64]string),
-				index: make(map[string]uint64),
-			}
-			return nil
-		}
-
-		set.idxs = &indexMap{
-			name:  make(map[uint64]string, b.Stats().KeyN),
-			index: make(map[string]uint64, b.Stats().KeyN),
-		}
-
-		c := b.Cursor()
-
-		for k, _ := c.First(); k != nil; k, _ = c.Next() {
-			idxStr := string(k)
-			propID, err := i.GetPropIndex(idxStr)
-			if err != nil {
-				return err
-			}
-
-			set.idxs.name[propID] = idxStr
-			set.idxs.index[idxStr] = propID
-		}
-
-		return nil
-	})
-
-	return err
+	return s, s.preparRootBuckets()
 }

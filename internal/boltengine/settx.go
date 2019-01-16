@@ -15,7 +15,7 @@ type SetTx struct {
 	id         ulid.ULID
 	idBuf      []byte
 	set        *Set
-	partition  *partition
+	partition  *Partition
 	payload    *schema.Payload
 	payloadBuf []byte
 	err        error
@@ -143,7 +143,7 @@ func (sx *SetTx) writePayload(n string, m proto.Message) {
 	}
 
 	var pn uint64
-	pn, sx.err = sx.set.GetPropIndex(n)
+	pn, sx.err = sx.set.instance.GetPropIndex(n)
 	if sx.err != nil {
 		return
 	}
@@ -157,7 +157,7 @@ func (sx *SetTx) readPayload(n string, m proto.Message) {
 	}
 
 	var pn uint64
-	pn, sx.err = sx.set.GetPropIndex(n)
+	pn, sx.err = sx.set.instance.GetPropIndex(n)
 	if sx.err != nil {
 		return
 	}

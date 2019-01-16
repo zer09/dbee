@@ -2,7 +2,8 @@ syntax = "proto3";
 package schema;
 
 message Set {
-  repeated Partition partition = 1;
+  // repeated Partition partition = 1;
+  map<string, Partition> partitions = 1;
 }
 
 message Partition {

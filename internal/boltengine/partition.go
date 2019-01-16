@@ -10,31 +10,30 @@ import (
 	bolt "go.etcd.io/bbolt"
 )
 
-type partition struct {
-	// name of the partition.
+type Partition struct {
+	// name of the Partition.
 	name string
-	// indexName file location of the partition.
+	// indexName file location of the Partition.
 	indexName string
-	// storeName file location of the partition.
+	// storeName file location of the Partition.
 	// This will be the storage of the data.
 	storeName string
-	opened    bool
 	index     *bolt.DB
 	store     *bolt.DB
 	set       *Set
 }
 
-func (p *partition) Name() string {
+func (p *Partition) Name() string {
 	return p.name
 }
 
-func (p *partition) Get(id ...string) (store.SetTx, error) {
+func (p *Partition) Get(id ...string) (store.SetTx, error) {
 	var err error
 
 	sx := &SetTx{
-		set:   p.set,
-		idBuf: make([]byte, 16),
-		partition:  p,
+		set:       p.set,
+		idBuf:     make([]byte, 16),
+		partition: p,
 		payload: &schema.Payload{
 			Meta:   &schema.Meta{Deleted: false},
 			Values: make(map[uint64][]byte),
