@@ -14,13 +14,13 @@ type Partition struct {
 	// name of the Partition.
 	name string
 	// indexName file location of the Partition.
-	indexName string
+	// indexName string
 	// storeName file location of the Partition.
 	// This will be the storage of the data.
 	storeName string
-	index     *bolt.DB
-	store     *bolt.DB
-	set       *Set
+	// index     *bolt.DB
+	store *bolt.DB
+	set   *Set
 }
 
 func (p *Partition) Name() string {

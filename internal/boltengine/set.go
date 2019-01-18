@@ -133,10 +133,6 @@ func (s *Set) getPartition(partitionName string) (*Partition, error) {
 	}
 
 	var p *schema.Partition
-	index, err := ulid.New(ulid.Now(), rand.Reader)
-	if err != nil {
-		return nil, err
-	}
 	store, err := ulid.New(ulid.Now(), rand.Reader)
 	if err != nil {
 		return nil, err
@@ -160,7 +156,6 @@ func (s *Set) getPartition(partitionName string) (*Partition, error) {
 
 		p = &schema.Partition{
 			Name:  partitionName,
-			Index: index.String(),
 			Store: store.String(),
 		}
 
@@ -179,7 +174,6 @@ func (s *Set) getPartition(partitionName string) (*Partition, error) {
 
 	s.partitions[partitionName] = &Partition{
 		name:      p.Name,
-		indexName: p.Index,
 		storeName: p.Store,
 		set:       s,
 	}
@@ -195,18 +189,16 @@ func (s *Set) getPartition(partitionName string) (*Partition, error) {
 }
 
 func (s *Set) preparRootBuckets() error {
+	var err error
 	for _, v := range s.partitions {
-		err := v.index.Update(func(tx *bolt.Tx) error {
-			_, err := tx.CreateBucketIfNotExists(rootBucket)
-			return err
-		})
-
-		if err != nil {
-			return err
-		}
-
 		err = v.store.Update(func(tx *bolt.Tx) error {
-			_, err := tx.CreateBucketIfNotExists(rootBucket)
+			var err error
+			_, err = tx.CreateBucketIfNotExists(rootBucket)
+			if err != nil {
+				return err
+			}
+
+			_, err = tx.CreateBucketIfNotExists(indexBucket)
 			return err
 		})
 

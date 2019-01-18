@@ -28,6 +28,8 @@ var (
 	sets = []byte("sets")
 	// rootBucket of the store
 	rootBucket = endian.I64toB(0)
+	// indexBucket will store all the index of the set.
+	indexBucket = endian.I64toB(1)
 )
 
 // boltOpt the default option for bolt.
@@ -112,10 +114,6 @@ func (i *Instance) Close() error {
 	var err error
 	for _, v := range i.sets {
 		for _, p := range v.partitions {
-			if err = p.index.Close(); err != nil {
-				return err
-			}
-
 			if err = p.store.Close(); err != nil {
 				return err
 			}
@@ -221,11 +219,6 @@ func (i *Instance) Set(name string) (store.Set, error) {
 				Partitions: make(map[string]*schema.Partition, 1),
 			}
 
-			index, err := ulid.New(ulid.Now(), rand.Reader)
-			if err != nil {
-				return err
-			}
-
 			store, err := ulid.New(ulid.Now(), rand.Reader)
 			if err != nil {
 				return err
@@ -233,7 +226,6 @@ func (i *Instance) Set(name string) (store.Set, error) {
 
 			setSchema.Partitions[defaultPartition] = &schema.Partition{
 				Name:  defaultPartition,
-				Index: index.String(),
 				Store: store.String(),
 			}
 
@@ -249,7 +241,6 @@ func (i *Instance) Set(name string) (store.Set, error) {
 
 			s.partitions[defaultPartition] = &Partition{
 				name:      defaultPartition,
-				indexName: index.String(),
 				storeName: store.String(),
 				set:       s,
 			}
@@ -266,7 +257,6 @@ func (i *Instance) Set(name string) (store.Set, error) {
 		for k, v := range setSchema.Partitions {
 			s.partitions[k] = &Partition{
 				name:      v.Name,
-				indexName: v.Index,
 				storeName: v.Store,
 				set:       s,
 			}

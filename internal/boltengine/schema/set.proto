@@ -8,6 +8,5 @@ message Set {
 
 message Partition {
   string name = 1;
-  string index = 2;
-  string store = 3;
+  string store = 2;
 }
