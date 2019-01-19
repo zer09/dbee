@@ -6,6 +6,7 @@ import (
 	"dbee/errors"
 	"dbee/internal/boltengine/schema"
 	"dbee/store"
+	"os"
 	"path/filepath"
 	"sync"
 	"time"
@@ -30,10 +31,16 @@ var (
 	rootBucket = endian.I64toB(0)
 	// indexBucket will store all the index of the set.
 	indexBucket = endian.I64toB(1)
+	// emptySlice will be used for values on empty for keys.
+	emptySlice = []byte{}
+	// emptyStruct an empty struct, mostly used for keys only map.
+	emptyStruct struct{}
 )
 
 // boltOpt the default option for bolt.
 var boltOpt = &bolt.Options{Timeout: 1 * time.Second}
+var pageSize = os.Getpagesize()
+var bucketMinSize = (pageSize * 3) - 16
 
 // metaMagicName is the magic file name of the meta information.
 const metaMagicName string = "01CRZFW6MBXA18393078QPCDQ7"

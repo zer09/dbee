@@ -9,10 +9,10 @@ type indexMap struct {
 	index map[string]uint64
 }
 
-// func (i *indexMap) indexable(propID uint64) bool {
-// 	_, ok := i.name[propID]
-// 	return ok
-// }
+func (i *indexMap) indexable(propID uint64) bool {
+	_, ok := i.name[propID]
+	return ok
+}
 
 func (i *indexMap) add(propID uint64, propName string) {
 	i.name[propID] = propName

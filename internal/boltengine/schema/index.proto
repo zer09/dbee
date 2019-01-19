@@ -1,0 +1,6 @@
+syntax = "proto3";
+package schema;
+
+message IndexSlice {
+  repeated bytes IDIndexes = 1;
+}

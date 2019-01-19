@@ -49,7 +49,7 @@ func (s *Set) Index(propName string) error {
 			return nil
 		}
 
-		return b.Put(idxBuf, nil)
+		return b.Put(idxBuf, emptySlice)
 	})
 
 	if err != nil {
