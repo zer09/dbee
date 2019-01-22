@@ -21,6 +21,7 @@ type SetTx struct {
 	payload    *schema.Payload
 	payloadBuf []byte
 	err        error
+	onDisk     bool
 }
 
 func (sx *SetTx) ID() string {
@@ -87,6 +88,10 @@ func (sx *SetTx) HardDelete() error {
 	return sx.err
 }
 
+func (sx *SetTx) OnDisk() bool {
+	return sx.onDisk
+}
+
 func (sx *SetTx) Commit() error {
 	if sx.err != nil {
 		return sx.err
@@ -116,6 +121,10 @@ func (sx *SetTx) Commit() error {
 
 		return sx.commitIndex(tx)
 	})
+
+	if sx.err == nil {
+		sx.onDisk = true
+	}
 
 	return sx.err
 }
@@ -155,13 +164,15 @@ func (sx *SetTx) storeIndexInBucket(iValBuc *bolt.Bucket) error {
 }
 
 func (sx *SetTx) storeIndexInSlice(idBuf []byte, b *bolt.Bucket) error {
-	var is *schema.IndexSlice
 	var err error
+	is := &schema.IndexSlice{IDIndexes: make([][]byte, 0)}
 
 	IDxsBuf := b.Get(idBuf)
-	err = proto.Unmarshal(IDxsBuf, is)
-	if err != nil {
-		return err
+	if IDxsBuf != nil {
+		err = proto.Unmarshal(IDxsBuf, is)
+		if err != nil {
+			return err
+		}
 	}
 
 	if binary.Size(IDxsBuf) >= bucketMinSize {
@@ -245,6 +256,7 @@ func (sx *SetTx) loadPayload() error {
 	sx.err = sx.partition.store.View(func(tx *bolt.Tx) error {
 		sx.payloadBuf = tx.Bucket(rootBucket).Get(sx.idBuf)
 		if sx.payloadBuf != nil {
+			sx.onDisk = true
 			return proto.Unmarshal(sx.payloadBuf, sx.payload)
 		}
 

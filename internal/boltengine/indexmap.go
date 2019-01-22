@@ -14,6 +14,14 @@ func (i *indexMap) indexable(propID uint64) bool {
 	return ok
 }
 
+func (i *indexMap) getIndex(propName string) uint64 {
+	if i, ok := i.index[propName]; ok {
+		return i
+	}
+
+	return 0
+}
+
 func (i *indexMap) add(propID uint64, propName string) {
 	i.name[propID] = propName
 	i.index[propName] = propID

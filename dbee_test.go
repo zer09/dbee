@@ -3,6 +3,7 @@ package dbee_test
 import (
 	"dbee/errors"
 	"dbee/store"
+	"math"
 	"os"
 
 	. "dbee"
@@ -453,6 +454,295 @@ var _ = Describe("dbee", func() {
 					l := len(set.ListIndexes())
 					Expect(l).Should(BeNumerically("==", 4))
 					Expect(set.ListIndexes()).Should(ConsistOf(idx))
+				})
+			})
+
+			Context("Read indexed values on partition", func() {
+				It("will init indexes", func() {
+					set, err := i.Set("indexedset")
+					Expect(err).NotTo(HaveOccurred())
+
+					err = set.Index("ifloat")
+					Expect(err).NotTo(HaveOccurred())
+
+					err = set.Index("idouble")
+					Expect(err).NotTo(HaveOccurred())
+
+					err = set.Index("iint")
+					Expect(err).NotTo(HaveOccurred())
+
+					err = set.Index("isint")
+					Expect(err).NotTo(HaveOccurred())
+
+					err = set.Index("iuint")
+					Expect(err).NotTo(HaveOccurred())
+
+					err = set.Index("ibool")
+					Expect(err).NotTo(HaveOccurred())
+
+					err = set.Index("istring")
+					Expect(err).NotTo(HaveOccurred())
+
+					err = set.Index("ibytes")
+					Expect(err).NotTo(HaveOccurred())
+
+					_, err = set.Partition("indexedpartition")
+					Expect(err).NotTo(HaveOccurred())
+				})
+
+				// It("will store and read float32", func() {
+				// 	var err error
+				// 	set, _ := i.Set("indexedset")
+				// 	part, _ := set.Partition("indexedpartition")
+
+				// 	var f0 float32 = 1
+				// 	var f1 float32 = 100
+				// 	var f2 float32 = 9999999
+				// 	var f3 float32 = -1
+				// 	var max float32 = math.MaxFloat32
+				// 	var min float32 = math.SmallestNonzeroFloat32
+
+				// 	sf0, _ := part.Get()
+				// 	sf0.Wfloat("ifloat", f0)
+				// 	sf0.Commit()
+
+				// 	sf0, _ = part.Get(sf0.ID())
+				// 	Expect(sf0.Rfloat("ifloat")).Should(BeNumerically("==", f0))
+
+				// 	sf0, err = part.One("ifloat", f0)
+				// 	Expect(err).NotTo(HaveOccurred())
+				// 	Expect(sf0).ShouldNot(BeNil())
+				// 	Expect(sf0.Rfloat("ifloat")).Should(BeNumerically("==", f0))
+
+				// 	sf1, _ := part.Get()
+				// 	sf1.Wfloat("ifloat", f1)
+				// 	sf1.Commit()
+
+				// 	sf1, _ = part.Get(sf1.ID())
+				// 	Expect(sf1.Rfloat("ifloat")).Should(BeNumerically("==", f1))
+
+				// 	sf1, err = part.One("ifloat", f1)
+				// 	Expect(err).NotTo(HaveOccurred())
+				// 	Expect(sf1).ShouldNot(BeNil())
+				// 	Expect(sf1.Rfloat("ifloat")).Should(BeNumerically("==", f1))
+
+				// 	sf2, _ := part.Get()
+				// 	sf2.Wfloat("ifloat", f2)
+				// 	sf2.Commit()
+
+				// 	sf2, _ = part.Get(sf2.ID())
+				// 	Expect(sf2.Rfloat("ifloat")).Should(BeNumerically("==", f2))
+
+				// 	sf2, err = part.One("ifloat", f2)
+				// 	Expect(err).NotTo(HaveOccurred())
+				// 	Expect(sf2).ShouldNot(BeNil())
+				// 	Expect(sf2.Rfloat("ifloat")).Should(BeNumerically("==", f2))
+
+				// 	sf3, _ := part.Get()
+				// 	sf3.Wfloat("ifloat", f3)
+				// 	sf3.Commit()
+
+				// 	sf3, _ = part.Get(sf3.ID())
+				// 	Expect(sf3.Rfloat("ifloat")).Should(BeNumerically("==", f3))
+
+				// 	sf3, err = part.One("ifloat", f3)
+				// 	Expect(err).NotTo(HaveOccurred())
+				// 	Expect(sf3).ShouldNot(BeNil())
+				// 	Expect(sf3.Rfloat("ifloat")).Should(BeNumerically("==", f3))
+
+				// 	sfMax, _ := part.Get()
+				// 	sfMax.Wfloat("ifloat", max)
+				// 	sfMax.Commit()
+
+				// 	sfMax, _ = part.Get(sfMax.ID())
+				// 	Expect(sfMax.Rfloat("ifloat")).Should(BeNumerically("==", max))
+
+				// 	sfMax, err = part.One("ifloat", max)
+				// 	Expect(err).NotTo(HaveOccurred())
+				// 	Expect(sfMax).ShouldNot(BeNil())
+				// 	Expect(sfMax.Rfloat("ifloat")).Should(BeNumerically("==", max))
+
+				// 	sfMin, _ := part.Get()
+				// 	sfMin.Wfloat("ifloat", min)
+				// 	sfMin.Commit()
+
+				// 	sfMin, _ = part.Get(sfMin.ID())
+				// 	Expect(sfMin.Rfloat("ifloat")).Should(BeNumerically("==", min))
+
+				// 	sfMin, err = part.One("ifloat", min)
+				// 	Expect(err).NotTo(HaveOccurred())
+				// 	Expect(sfMin).ShouldNot(BeNil())
+				// 	Expect(sfMin.Rfloat("ifloat")).Should(BeNumerically("==", min))
+				// })
+
+				// It("will store and read float64", func() {
+				// 	var err error
+				// 	set, _ := i.Set("indexedset")
+				// 	part, _ := set.Partition("indexedpartition")
+
+				// 	var f0 float64 = 1
+				// 	var f1 float64 = 100
+				// 	var f2 float64 = 9999999
+				// 	var f3 float64 = -1
+				// 	var max float64 = math.MaxFloat64
+				// 	var min float64 = math.SmallestNonzeroFloat64
+
+				// 	sf0, _ := part.Get()
+				// 	sf0.Wdouble("idouble", f0)
+				// 	sf0.Commit()
+
+				// 	sf0, _ = part.Get(sf0.ID())
+				// 	Expect(sf0.Rdouble("idouble")).Should(BeNumerically("==", f0))
+
+				// 	sf0, err = part.One("idouble", f0)
+				// 	Expect(err).NotTo(HaveOccurred())
+				// 	Expect(sf0).ShouldNot(BeNil())
+				// 	Expect(sf0.Rdouble("idouble")).Should(BeNumerically("==", f0))
+
+				// 	sf1, _ := part.Get()
+				// 	sf1.Wdouble("idouble", f1)
+				// 	sf1.Commit()
+
+				// 	sf1, _ = part.Get(sf1.ID())
+				// 	Expect(sf1.Rdouble("idouble")).Should(BeNumerically("==", f1))
+
+				// 	sf1, err = part.One("idouble", f1)
+				// 	Expect(err).NotTo(HaveOccurred())
+				// 	Expect(sf1).ShouldNot(BeNil())
+				// 	Expect(sf1.Rdouble("idouble")).Should(BeNumerically("==", f1))
+
+				// 	sf2, _ := part.Get()
+				// 	sf2.Wdouble("idouble", f2)
+				// 	sf2.Commit()
+
+				// 	sf2, _ = part.Get(sf2.ID())
+				// 	Expect(sf2.Rdouble("idouble")).Should(BeNumerically("==", f2))
+
+				// 	sf2, err = part.One("idouble", f2)
+				// 	Expect(err).NotTo(HaveOccurred())
+				// 	Expect(sf2).ShouldNot(BeNil())
+				// 	Expect(sf2.Rdouble("idouble")).Should(BeNumerically("==", f2))
+
+				// 	sf3, _ := part.Get()
+				// 	sf3.Wdouble("idouble", f3)
+				// 	sf3.Commit()
+
+				// 	sf3, _ = part.Get(sf3.ID())
+				// 	Expect(sf3.Rdouble("idouble")).Should(BeNumerically("==", f3))
+
+				// 	sf3, err = part.One("idouble", f3)
+				// 	Expect(err).NotTo(HaveOccurred())
+				// 	Expect(sf3).ShouldNot(BeNil())
+				// 	Expect(sf3.Rdouble("idouble")).Should(BeNumerically("==", f3))
+
+				// 	sfMax, _ := part.Get()
+				// 	sfMax.Wdouble("idouble", max)
+				// 	sfMax.Commit()
+
+				// 	sfMax, _ = part.Get(sfMax.ID())
+				// 	Expect(sfMax.Rdouble("idouble")).Should(BeNumerically("==", max))
+
+				// 	sfMax, err = part.One("idouble", max)
+				// 	Expect(err).NotTo(HaveOccurred())
+				// 	Expect(sfMax).ShouldNot(BeNil())
+				// 	Expect(sfMax.Rdouble("idouble")).Should(BeNumerically("==", max))
+
+				// 	sfMin, _ := part.Get()
+				// 	sfMin.Wdouble("idouble", min)
+				// 	sfMin.Commit()
+
+				// 	sfMin, _ = part.Get(sfMin.ID())
+				// 	Expect(sfMin.Rdouble("idouble")).Should(BeNumerically("==", min))
+
+				// 	sfMin, err = part.One("idouble", min)
+				// 	Expect(err).NotTo(HaveOccurred())
+				// 	Expect(sfMin).ShouldNot(BeNil())
+				// 	Expect(sfMin.Rdouble("idouble")).Should(BeNumerically("==", min))
+				// })
+
+				It("will store and read int", func() {
+					var err error
+					set, _ := i.Set("indexedset")
+					part, _ := set.Partition("indexedpartition")
+
+					// var f0 int64 = 1
+					// var f1 int64 = 100
+					// var f2 int64 = 9999999
+					var f3 int64 = -1
+					// var max int64 = math.MaxInt64
+					var min int64 = math.MinInt64
+
+					// sf0, _ := part.Get()
+					// sf0.Wint("iint", f0)
+					// sf0.Commit()
+
+					// sf0, _ = part.Get(sf0.ID())
+					// Expect(sf0.Rint("iint")).Should(BeNumerically("==", f0))
+
+					// sf0, err = part.One("iint", f0)
+					// Expect(err).NotTo(HaveOccurred())
+					// Expect(sf0).ShouldNot(BeNil())
+					// Expect(sf0.Rint("iint")).Should(BeNumerically("==", f0))
+
+					// sf1, _ := part.Get()
+					// sf1.Wint("iint", f1)
+					// sf1.Commit()
+
+					// sf1, _ = part.Get(sf1.ID())
+					// Expect(sf1.Rint("iint")).Should(BeNumerically("==", f1))
+
+					// sf1, err = part.One("iint", f1)
+					// Expect(err).NotTo(HaveOccurred())
+					// Expect(sf1).ShouldNot(BeNil())
+					// Expect(sf1.Rint("iint")).Should(BeNumerically("==", f1))
+
+					// sf2, _ := part.Get()
+					// sf2.Wint("iint", f2)
+					// sf2.Commit()
+
+					// sf2, _ = part.Get(sf2.ID())
+					// Expect(sf2.Rint("iint")).Should(BeNumerically("==", f2))
+
+					// sf2, err = part.One("iint", f2)
+					// Expect(err).NotTo(HaveOccurred())
+					// Expect(sf2).ShouldNot(BeNil())
+					// Expect(sf2.Rint("iint")).Should(BeNumerically("==", f2))
+
+					sf3, _ := part.Get()
+					sf3.Wint("iint", f3)
+					sf3.Commit()
+
+					sf3, _ = part.Get(sf3.ID())
+					Expect(sf3.Rint("iint")).Should(BeNumerically("==", f3))
+
+					sf3, err = part.One("iint", f3)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(sf3).ShouldNot(BeNil())
+					Expect(sf3.Rint("iint")).Should(BeNumerically("==", f3))
+
+					// sfMax, _ := part.Get()
+					// sfMax.Wint("iint", max)
+					// sfMax.Commit()
+
+					// sfMax, _ = part.Get(sfMax.ID())
+					// Expect(sfMax.Rint("iint")).Should(BeNumerically("==", max))
+
+					// sfMax, err = part.One("iint", max)
+					// Expect(err).NotTo(HaveOccurred())
+					// Expect(sfMax).ShouldNot(BeNil())
+					// Expect(sfMax.Rint("iint")).Should(BeNumerically("==", max))
+
+					sfMin, _ := part.Get()
+					sfMin.Wint("iint", min)
+					sfMin.Commit()
+
+					sfMin, _ = part.Get(sfMin.ID())
+					Expect(sfMin.Rint("iint")).Should(BeNumerically("==", min))
+
+					sfMin, err = part.One("iint", min)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(sfMin).ShouldNot(BeNil())
+					Expect(sfMin.Rint("iint")).Should(BeNumerically("==", min))
 				})
 			})
 		}

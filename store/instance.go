@@ -60,6 +60,7 @@ type Partition interface {
 	// If you provide the id, it means that the data is already existed,
 	// otherwise just leave it and it will be treated as a new data.
 	Get(id ...string) (SetTx, error)
+	One(propName string, value interface{}) (SetTx, error)
 }
 
 type SetTx interface {
@@ -89,6 +90,9 @@ type SetTx interface {
 
 	// Commit the the item.
 	Commit() error
+
+	// OnDisk identify if the data is saved in disk
+	OnDisk() bool
 
 	Wfloat(n string, v float32)
 	Wdouble(n string, v float64)
