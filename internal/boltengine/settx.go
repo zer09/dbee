@@ -1,10 +1,11 @@
 package boltengine
 
 import (
+	"bytes"
 	"dbee/endian"
 	"dbee/internal/boltengine/schema"
 	"dbee/store"
-	"encoding/binary"
+	"encoding/gob"
 	"time"
 
 	proto "github.com/golang/protobuf/proto"
@@ -14,14 +15,22 @@ import (
 )
 
 type SetTx struct {
-	id         ulid.ULID
-	idBuf      []byte
-	set        *Set
-	partition  *Partition
-	payload    *schema.Payload
-	payloadBuf []byte
-	err        error
-	onDisk     bool
+	id              ulid.ULID
+	idBuf           []byte
+	set             *Set
+	partition       *Partition
+	payload         *schema.Payload
+	indexable       map[uint64]interface{}
+	payloadBuf      []byte
+	err             error
+	onDisk          bool
+	indexableFloat  map[uint64]float32
+	indexableDouble map[uint64]float64
+	indexableInt    map[uint64]int64
+	indexableSint   map[uint64]int64
+	indexableUint   map[uint64]uint64
+	indexableBool   map[uint64]bool
+	indexableString map[uint64]string
 }
 
 func (sx *SetTx) ID() string {
@@ -130,115 +139,36 @@ func (sx *SetTx) Commit() error {
 }
 
 func (sx *SetTx) commitIndex(tx *bolt.Tx) error {
-	var b *bolt.Bucket
-	var err error
-	for k, _ := range sx.payload.Values {
-		if !sx.set.idxs.indexable(k) {
-			continue
-		}
-
-		if b == nil {
-			b = tx.Bucket(indexBucket)
-		}
-
-		idBuf := endian.I64toB(k)
-		iValBuc := b.Bucket(idBuf)
-		if iValBuc != nil {
-			err = sx.storeIndexInBucket(iValBuc)
-			if err != nil {
-				return err
-			}
-		}
-
-		err = sx.storeIndexInSlice(idBuf, b)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (sx *SetTx) storeIndexInBucket(iValBuc *bolt.Bucket) error {
-	return iValBuc.Put(sx.idBuf, emptySlice)
-}
-
-func (sx *SetTx) storeIndexInSlice(idBuf []byte, b *bolt.Bucket) error {
-	var err error
-	is := &schema.IndexSlice{IDIndexes: make([][]byte, 0)}
-
-	IDxsBuf := b.Get(idBuf)
-	if IDxsBuf != nil {
-		err = proto.Unmarshal(IDxsBuf, is)
-		if err != nil {
-			return err
-		}
-	}
-
-	if binary.Size(IDxsBuf) >= bucketMinSize {
-		return sx.convertSliceToBucket(idBuf, is, b)
-	}
-
-	seen := make(map[string]struct{}, len(is.IDIndexes))
-	j := 0
-	for _, v := range is.IDIndexes {
-		u := &ulid.ULID{}
-		err = u.UnmarshalBinary(v)
-		if err != nil {
-			return err
-		}
-
-		us := u.String()
-		if _, ok := seen[us]; ok {
-			continue
-		}
-
-		seen[us] = emptyStruct
-		is.IDIndexes[j] = v
-		j++
-	}
-
-	is.IDIndexes = is.IDIndexes[:j]
-
-	if _, ok := seen[sx.id.String()]; !ok {
-		is.IDIndexes = append(is.IDIndexes, sx.idBuf)
-	}
-
-	IDxsBuf, err = proto.Marshal(is)
-	if err != nil {
+	if len(sx.indexable) < 1 {
 		return nil
 	}
 
-	return b.Put(idBuf, IDxsBuf)
-}
+	b := tx.Bucket(indexBucket)
 
-func (sx *SetTx) convertSliceToBucket(
-	idBuf []byte, is *schema.IndexSlice, b *bolt.Bucket) error {
-	var err error
-	err = b.Delete(idBuf)
-	if err != nil {
-		return err
-	}
-
-	//deduplicate
-	m := make(map[string][]byte)
-	for _, v := range is.IDIndexes {
-		u := &ulid.ULID{}
-		err = u.UnmarshalBinary(v)
+	for k, v := range sx.indexable {
+		// convert the property numeric index to bytes
+		idBuf := endian.I64toB(k)
+		// get the bucket of the property
+		propBuc, err := b.CreateBucketIfNotExists(idBuf)
 		if err != nil {
 			return err
 		}
 
-		m[u.String()] = v
-	}
+		// convert the value to buffer, so it can be use as keys on the propBuc
+		var buf bytes.Buffer
+		enc := gob.NewEncoder(&buf)
+		err = enc.Encode(v)
+		if err != nil {
+			return err
+		}
 
-	iValBuc, err := b.CreateBucketIfNotExists(idBuf)
-	if err != nil {
-		return err
-	}
+		// get the bucket using the value as key
+		valBuc, err := propBuc.CreateBucketIfNotExists(buf.Bytes())
+		if err != nil {
+			return err
+		}
 
-	for _, v := range m {
-		err = iValBuc.Put(v, emptySlice)
+		err = valBuc.Put(sx.idBuf, emptySlice)
 		if err != nil {
 			return err
 		}
@@ -266,24 +196,32 @@ func (sx *SetTx) loadPayload() error {
 	return sx.err
 }
 
-func (sx *SetTx) writePayload(n string, m proto.Message) {
+// writePayload will write the prop payload to sx.
+// returns uint64 greater than zero if the prop is indexable;
+func (sx *SetTx) writePayload(n string, m proto.Message, v interface{}) uint64 {
 	if sx.err != nil {
-		return
+		return 0
 	}
 
 	var pBuf []byte
 	pBuf, sx.err = proto.Marshal(m)
 	if sx.err != nil {
-		return
+		return 0
 	}
 
 	var pn uint64
 	pn, sx.err = sx.set.instance.GetPropIndex(n)
 	if sx.err != nil {
-		return
+		return 0
 	}
 
 	sx.payload.Values[pn] = pBuf
+
+	if sx.set.idxs.indexable(pn) {
+		return pn
+	}
+
+	return 0
 }
 
 func (sx *SetTx) readPayload(n string, m proto.Message) {

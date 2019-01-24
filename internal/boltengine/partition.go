@@ -37,6 +37,7 @@ func (p *Partition) Get(id ...string) (store.SetTx, error) {
 		set:       p.set,
 		idBuf:     make([]byte, 16),
 		partition: p,
+		indexable: make(map[uint64]interface{}),
 		payload: &schema.Payload{
 			Meta:   &schema.Meta{Deleted: false},
 			Values: make(map[uint64][]byte),
