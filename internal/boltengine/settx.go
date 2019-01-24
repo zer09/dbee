@@ -1,11 +1,9 @@
 package boltengine
 
 import (
-	"bytes"
 	"dbee/endian"
 	"dbee/internal/boltengine/schema"
 	"dbee/store"
-	"encoding/gob"
 	"time"
 
 	proto "github.com/golang/protobuf/proto"
@@ -24,12 +22,7 @@ type SetTx struct {
 	payloadBuf      []byte
 	err             error
 	onDisk          bool
-	indexableFloat  map[uint64]float32
-	indexableDouble map[uint64]float64
-	indexableInt    map[uint64]int64
-	indexableSint   map[uint64]int64
 	indexableUint   map[uint64]uint64
-	indexableBool   map[uint64]bool
 	indexableString map[uint64]string
 }
 
@@ -139,42 +132,76 @@ func (sx *SetTx) Commit() error {
 }
 
 func (sx *SetTx) commitIndex(tx *bolt.Tx) error {
-	if len(sx.indexable) < 1 {
+	if let(sx.indexable) < 1 {
+		return nil
+	}
+
+	var err error
+	err = sx.indexString(tx)
+	if err != nil {
+		return err
+	}
+
+	err = sx.indexUint(tx)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (sx *SetTx) indexString(tx *bolt.Tx) error {
+	if len(sx.indexableString) < 1 {
 		return nil
 	}
 
 	b := tx.Bucket(indexBucket)
+	sb := b.Bucket(indexStringBucket)
 
-	for k, v := range sx.indexable {
-		// convert the property numeric index to bytes
-		idBuf := endian.I64toB(k)
-		// get the bucket of the property
-		propBuc, err := b.CreateBucketIfNotExists(idBuf)
+	for k, v := range sx.indexableString {
+		kb, err := sb.CreateBucketIfNotExists(endian.I64toB(k))
 		if err != nil {
 			return err
 		}
 
-		// convert the value to buffer, so it can be use as keys on the propBuc
-		var buf bytes.Buffer
-		enc := gob.NewEncoder(&buf)
-		err = enc.Encode(v)
+		vb, err := kb.CreateBucketIfNotExists([]byte(v))
 		if err != nil {
 			return err
 		}
 
-		// get the bucket using the value as key
-		valBuc, err := propBuc.CreateBucketIfNotExists(buf.Bytes())
-		if err != nil {
-			return err
-		}
-
-		err = valBuc.Put(sx.idBuf, emptySlice)
+		err = vb.Put(sx.idBuf, emptySlice)
 		if err != nil {
 			return err
 		}
 	}
 
-	return nil
+	return err
+}
+
+func (sx *SetTx) indexUint(tx *bolt.Tx) error {
+	if len(sx.indexableUint) < 1 {
+		return nil
+	}
+
+	b := tx.Bucket(indexBucket)
+	ub := b.Bucket(indexUintBucket)
+
+	for k, v := range sx.indexableUint {
+		kb, err := ub.CreateBucketIfNotExists(endian.I64toB(k))
+		if err != nil {
+			return err
+		}
+
+		vb, err := kb.CreateBucketIfNotExists(endian.I64toB(v))
+		if err != nil {
+			return err
+		}
+
+		err = vb.Put(sx.idBuf, emptySlice)
+		if err != nil {
+			return nil
+		}
+	}
 }
 
 func (sx *SetTx) loadPayload() error {

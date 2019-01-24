@@ -30,6 +30,10 @@ var (
 	rootBucket = endian.I64toB(0)
 	// indexBucket will store all the index of the set.
 	indexBucket = endian.I64toB(1)
+	// indexStringBucket will store all the index on string type.
+	indexStringBucket = endian.I64toB(0)
+	//indexUintBucket will store all the index on uint type.
+	indexUintBucket = endian.I64toB(1)
 	// emptySlice will be used for values on empty for keys.
 	emptySlice = []byte{}
 	// emptyStruct an empty struct, mostly used for keys only map.

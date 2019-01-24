@@ -198,7 +198,18 @@ func (s *Set) preparRootBuckets() error {
 				return err
 			}
 
-			_, err = tx.CreateBucketIfNotExists(indexBucket)
+			b, err := tx.CreateBucketIfNotExists(indexBucket)
+			if err != nil {
+				return err
+			}
+
+			_, err := b.CreateBucketIfNotExists(indexStringBucket)
+			if err != nil {
+				return nil
+			}
+
+			_, err := b.CreateBucketIfNotExists(indexUintBucket)
+
 			return err
 		})
 
