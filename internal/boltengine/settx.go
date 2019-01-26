@@ -18,11 +18,11 @@ type SetTx struct {
 	set             *Set
 	partition       *Partition
 	payload         *schema.Payload
-	indexable       map[uint64]interface{}
 	payloadBuf      []byte
 	err             error
 	onDisk          bool
 	indexableUint   map[uint64]uint64
+	indexableNint   map[uint64]uint64
 	indexableString map[uint64]string
 }
 
@@ -70,24 +70,20 @@ func (sx *SetTx) HardDelete() error {
 	}
 
 	// Check if the item is alread stored.
-	if sx.payload.Meta.CreatedOn == nil {
+	if !sx.onDisk {
 		return nil
-	}
-
-	sx.payload.Meta.LastUpdate, sx.err = ptypes.TimestampProto(time.Now().UTC())
-	if sx.err != nil {
-		return sx.err
-	}
-
-	if sx.payloadBuf, sx.err = proto.Marshal(sx.payload); sx.err != nil {
-		return sx.err
 	}
 
 	sx.err = sx.partition.store.Update(func(tx *bolt.Tx) error {
 		return tx.Bucket(rootBucket).Delete(sx.idBuf)
 	})
 
-	return sx.err
+	if sx.err != nil {
+		return sx.err
+	}
+
+	sx.onDisk = false
+	return nil
 }
 
 func (sx *SetTx) OnDisk() bool {
@@ -132,12 +128,7 @@ func (sx *SetTx) Commit() error {
 }
 
 func (sx *SetTx) commitIndex(tx *bolt.Tx) error {
-	if let(sx.indexable) < 1 {
-		return nil
-	}
-
-	var err error
-	err = sx.indexString(tx)
+	err := sx.indexString(tx)
 	if err != nil {
 		return err
 	}
@@ -147,7 +138,9 @@ func (sx *SetTx) commitIndex(tx *bolt.Tx) error {
 		return err
 	}
 
-	return nil
+	err = sx.indexNint(tx)
+
+	return err
 }
 
 func (sx *SetTx) indexString(tx *bolt.Tx) error {
@@ -175,7 +168,7 @@ func (sx *SetTx) indexString(tx *bolt.Tx) error {
 		}
 	}
 
-	return err
+	return nil
 }
 
 func (sx *SetTx) indexUint(tx *bolt.Tx) error {
@@ -199,9 +192,39 @@ func (sx *SetTx) indexUint(tx *bolt.Tx) error {
 
 		err = vb.Put(sx.idBuf, emptySlice)
 		if err != nil {
-			return nil
+			return err
 		}
 	}
+
+	return nil
+}
+
+func (sx *SetTx) indexNint(tx *bolt.Tx) error {
+	if len(sx.indexableNint) < 1 {
+		return nil
+	}
+
+	b := tx.Bucket(indexBucket)
+	nb := b.Bucket(indexNintBucket)
+
+	for k, v := range sx.indexableNint {
+		kb, err := nb.CreateBucketIfNotExists(endian.I64toB(k))
+		if err != nil {
+			return nil
+		}
+
+		vb, err := kb.CreateBucketIfNotExists(endian.I64toB(v))
+		if err != nil {
+			return nil
+		}
+
+		err = vb.Put(sx.idBuf, emptySlice)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (sx *SetTx) loadPayload() error {
@@ -223,9 +246,30 @@ func (sx *SetTx) loadPayload() error {
 	return sx.err
 }
 
-// writePayload will write the prop payload to sx.
+func (sx *SetTx) writePayload(n string, m proto.Message) {
+	if sx.err != nil {
+		return
+	}
+
+	var pBuf []byte
+	pBuf, sx.err = proto.Marshal(m)
+	if sx.err != nil {
+		return
+	}
+
+	var pn uint64
+	pn, sx.err = sx.set.instance.GetPropIndex(n)
+	if sx.err != nil {
+		return
+	}
+
+	sx.payload.Values[pn] = pBuf
+}
+
+// writeIndexablePayload will write the prop payload to sx.
 // returns uint64 greater than zero if the prop is indexable;
-func (sx *SetTx) writePayload(n string, m proto.Message, v interface{}) uint64 {
+func (sx *SetTx) writeIndexablePayload(n string, m proto.Message) uint64 {
+
 	if sx.err != nil {
 		return 0
 	}

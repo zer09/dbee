@@ -34,6 +34,8 @@ var (
 	indexStringBucket = endian.I64toB(0)
 	//indexUintBucket will store all the index on uint type.
 	indexUintBucket = endian.I64toB(1)
+	// indexNintBucket will store all the index on negative int.
+	indexNintBucket = endian.I64toB(2)
 	// emptySlice will be used for values on empty for keys.
 	emptySlice = []byte{}
 	// emptyStruct an empty struct, mostly used for keys only map.
@@ -294,5 +296,5 @@ func (i *Instance) Set(name string) (store.Set, error) {
 		return nil, err
 	}
 
-	return s, s.preparRootBuckets()
+	return s, s.prepareRootBuckets()
 }

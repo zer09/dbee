@@ -185,10 +185,10 @@ func (s *Set) getPartition(partitionName string) (*Partition, error) {
 		}
 	}
 
-	return s.partitions[partitionName], s.preparRootBuckets()
+	return s.partitions[partitionName], s.prepareRootBuckets()
 }
 
-func (s *Set) preparRootBuckets() error {
+func (s *Set) prepareRootBuckets() error {
 	var err error
 	for _, v := range s.partitions {
 		err = v.store.Update(func(tx *bolt.Tx) error {
@@ -203,12 +203,17 @@ func (s *Set) preparRootBuckets() error {
 				return err
 			}
 
-			_, err := b.CreateBucketIfNotExists(indexStringBucket)
+			_, err = b.CreateBucketIfNotExists(indexStringBucket)
 			if err != nil {
 				return nil
 			}
 
-			_, err := b.CreateBucketIfNotExists(indexUintBucket)
+			_, err = b.CreateBucketIfNotExists(indexUintBucket)
+			if err != nil {
+				return err
+			}
+
+			_, err = b.CreateBucketIfNotExists(indexNintBucket)
 
 			return err
 		})

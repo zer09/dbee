@@ -94,19 +94,13 @@ type SetTx interface {
 	// OnDisk identify if the data is saved in disk
 	OnDisk() bool
 
-	Wfloat(n string, v float32)
-	Wdouble(n string, v float64)
 	Wint(n string, v int64)
-	Wsint(n string, v int64)
 	Wuint(n string, v uint64)
 	Wbool(n string, v bool)
 	Wstring(n string, v string)
 	Wbytes(n string, v []byte)
 
-	Rfloat(n string) float32
-	Rdouble(n string) float64
 	Rint(n string) int64
-	Rsint(n string) int64
 	Ruint(n string) uint64
 	Rbool(n string) bool
 	Rstring(n string) string
