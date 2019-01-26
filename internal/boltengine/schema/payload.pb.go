@@ -32,7 +32,7 @@ func (m *Meta) Reset()         { *m = Meta{} }
 func (m *Meta) String() string { return proto.CompactTextString(m) }
 func (*Meta) ProtoMessage()    {}
 func (*Meta) Descriptor() ([]byte, []int) {
-	return fileDescriptor_payload_e75f9c78716bf7d8, []int{0}
+	return fileDescriptor_payload_563679a0bb4d487b, []int{0}
 }
 func (m *Meta) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Meta.Unmarshal(m, b)
@@ -86,7 +86,7 @@ func (m *Payload) Reset()         { *m = Payload{} }
 func (m *Payload) String() string { return proto.CompactTextString(m) }
 func (*Payload) ProtoMessage()    {}
 func (*Payload) Descriptor() ([]byte, []int) {
-	return fileDescriptor_payload_e75f9c78716bf7d8, []int{1}
+	return fileDescriptor_payload_563679a0bb4d487b, []int{1}
 }
 func (m *Payload) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Payload.Unmarshal(m, b)
@@ -120,120 +120,6 @@ func (m *Payload) GetValues() map[uint64][]byte {
 	return nil
 }
 
-type PayloadDouble struct {
-	Value                float64  `protobuf:"fixed64,1,opt,name=Value,proto3" json:"Value,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *PayloadDouble) Reset()         { *m = PayloadDouble{} }
-func (m *PayloadDouble) String() string { return proto.CompactTextString(m) }
-func (*PayloadDouble) ProtoMessage()    {}
-func (*PayloadDouble) Descriptor() ([]byte, []int) {
-	return fileDescriptor_payload_e75f9c78716bf7d8, []int{2}
-}
-func (m *PayloadDouble) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PayloadDouble.Unmarshal(m, b)
-}
-func (m *PayloadDouble) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PayloadDouble.Marshal(b, m, deterministic)
-}
-func (dst *PayloadDouble) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PayloadDouble.Merge(dst, src)
-}
-func (m *PayloadDouble) XXX_Size() int {
-	return xxx_messageInfo_PayloadDouble.Size(m)
-}
-func (m *PayloadDouble) XXX_DiscardUnknown() {
-	xxx_messageInfo_PayloadDouble.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_PayloadDouble proto.InternalMessageInfo
-
-func (m *PayloadDouble) GetValue() float64 {
-	if m != nil {
-		return m.Value
-	}
-	return 0
-}
-
-type PayloadFloat struct {
-	Value                float32  `protobuf:"fixed32,1,opt,name=Value,proto3" json:"Value,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *PayloadFloat) Reset()         { *m = PayloadFloat{} }
-func (m *PayloadFloat) String() string { return proto.CompactTextString(m) }
-func (*PayloadFloat) ProtoMessage()    {}
-func (*PayloadFloat) Descriptor() ([]byte, []int) {
-	return fileDescriptor_payload_e75f9c78716bf7d8, []int{3}
-}
-func (m *PayloadFloat) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PayloadFloat.Unmarshal(m, b)
-}
-func (m *PayloadFloat) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PayloadFloat.Marshal(b, m, deterministic)
-}
-func (dst *PayloadFloat) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PayloadFloat.Merge(dst, src)
-}
-func (m *PayloadFloat) XXX_Size() int {
-	return xxx_messageInfo_PayloadFloat.Size(m)
-}
-func (m *PayloadFloat) XXX_DiscardUnknown() {
-	xxx_messageInfo_PayloadFloat.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_PayloadFloat proto.InternalMessageInfo
-
-func (m *PayloadFloat) GetValue() float32 {
-	if m != nil {
-		return m.Value
-	}
-	return 0
-}
-
-type PayloadInt64 struct {
-	Value                int64    `protobuf:"varint,1,opt,name=Value,proto3" json:"Value,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *PayloadInt64) Reset()         { *m = PayloadInt64{} }
-func (m *PayloadInt64) String() string { return proto.CompactTextString(m) }
-func (*PayloadInt64) ProtoMessage()    {}
-func (*PayloadInt64) Descriptor() ([]byte, []int) {
-	return fileDescriptor_payload_e75f9c78716bf7d8, []int{4}
-}
-func (m *PayloadInt64) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PayloadInt64.Unmarshal(m, b)
-}
-func (m *PayloadInt64) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PayloadInt64.Marshal(b, m, deterministic)
-}
-func (dst *PayloadInt64) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PayloadInt64.Merge(dst, src)
-}
-func (m *PayloadInt64) XXX_Size() int {
-	return xxx_messageInfo_PayloadInt64.Size(m)
-}
-func (m *PayloadInt64) XXX_DiscardUnknown() {
-	xxx_messageInfo_PayloadInt64.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_PayloadInt64 proto.InternalMessageInfo
-
-func (m *PayloadInt64) GetValue() int64 {
-	if m != nil {
-		return m.Value
-	}
-	return 0
-}
-
 type PayloadSint64 struct {
 	Value                int64    `protobuf:"zigzag64,1,opt,name=Value,proto3" json:"Value,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -245,7 +131,7 @@ func (m *PayloadSint64) Reset()         { *m = PayloadSint64{} }
 func (m *PayloadSint64) String() string { return proto.CompactTextString(m) }
 func (*PayloadSint64) ProtoMessage()    {}
 func (*PayloadSint64) Descriptor() ([]byte, []int) {
-	return fileDescriptor_payload_e75f9c78716bf7d8, []int{5}
+	return fileDescriptor_payload_563679a0bb4d487b, []int{2}
 }
 func (m *PayloadSint64) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PayloadSint64.Unmarshal(m, b)
@@ -283,7 +169,7 @@ func (m *PayloadUint64) Reset()         { *m = PayloadUint64{} }
 func (m *PayloadUint64) String() string { return proto.CompactTextString(m) }
 func (*PayloadUint64) ProtoMessage()    {}
 func (*PayloadUint64) Descriptor() ([]byte, []int) {
-	return fileDescriptor_payload_e75f9c78716bf7d8, []int{6}
+	return fileDescriptor_payload_563679a0bb4d487b, []int{3}
 }
 func (m *PayloadUint64) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PayloadUint64.Unmarshal(m, b)
@@ -321,7 +207,7 @@ func (m *PayloadBool) Reset()         { *m = PayloadBool{} }
 func (m *PayloadBool) String() string { return proto.CompactTextString(m) }
 func (*PayloadBool) ProtoMessage()    {}
 func (*PayloadBool) Descriptor() ([]byte, []int) {
-	return fileDescriptor_payload_e75f9c78716bf7d8, []int{7}
+	return fileDescriptor_payload_563679a0bb4d487b, []int{4}
 }
 func (m *PayloadBool) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PayloadBool.Unmarshal(m, b)
@@ -359,7 +245,7 @@ func (m *PayloadString) Reset()         { *m = PayloadString{} }
 func (m *PayloadString) String() string { return proto.CompactTextString(m) }
 func (*PayloadString) ProtoMessage()    {}
 func (*PayloadString) Descriptor() ([]byte, []int) {
-	return fileDescriptor_payload_e75f9c78716bf7d8, []int{8}
+	return fileDescriptor_payload_563679a0bb4d487b, []int{5}
 }
 func (m *PayloadString) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PayloadString.Unmarshal(m, b)
@@ -397,7 +283,7 @@ func (m *PayloadBytes) Reset()         { *m = PayloadBytes{} }
 func (m *PayloadBytes) String() string { return proto.CompactTextString(m) }
 func (*PayloadBytes) ProtoMessage()    {}
 func (*PayloadBytes) Descriptor() ([]byte, []int) {
-	return fileDescriptor_payload_e75f9c78716bf7d8, []int{9}
+	return fileDescriptor_payload_563679a0bb4d487b, []int{6}
 }
 func (m *PayloadBytes) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PayloadBytes.Unmarshal(m, b)
@@ -424,360 +310,39 @@ func (m *PayloadBytes) GetValue() []byte {
 	return nil
 }
 
-type PayloadDoubleArr struct {
-	Value                []float64 `protobuf:"fixed64,1,rep,packed,name=Value,proto3" json:"Value,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
-}
-
-func (m *PayloadDoubleArr) Reset()         { *m = PayloadDoubleArr{} }
-func (m *PayloadDoubleArr) String() string { return proto.CompactTextString(m) }
-func (*PayloadDoubleArr) ProtoMessage()    {}
-func (*PayloadDoubleArr) Descriptor() ([]byte, []int) {
-	return fileDescriptor_payload_e75f9c78716bf7d8, []int{10}
-}
-func (m *PayloadDoubleArr) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PayloadDoubleArr.Unmarshal(m, b)
-}
-func (m *PayloadDoubleArr) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PayloadDoubleArr.Marshal(b, m, deterministic)
-}
-func (dst *PayloadDoubleArr) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PayloadDoubleArr.Merge(dst, src)
-}
-func (m *PayloadDoubleArr) XXX_Size() int {
-	return xxx_messageInfo_PayloadDoubleArr.Size(m)
-}
-func (m *PayloadDoubleArr) XXX_DiscardUnknown() {
-	xxx_messageInfo_PayloadDoubleArr.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_PayloadDoubleArr proto.InternalMessageInfo
-
-func (m *PayloadDoubleArr) GetValue() []float64 {
-	if m != nil {
-		return m.Value
-	}
-	return nil
-}
-
-type PayloadFloatArr struct {
-	Value                []float32 `protobuf:"fixed32,1,rep,packed,name=Value,proto3" json:"Value,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
-}
-
-func (m *PayloadFloatArr) Reset()         { *m = PayloadFloatArr{} }
-func (m *PayloadFloatArr) String() string { return proto.CompactTextString(m) }
-func (*PayloadFloatArr) ProtoMessage()    {}
-func (*PayloadFloatArr) Descriptor() ([]byte, []int) {
-	return fileDescriptor_payload_e75f9c78716bf7d8, []int{11}
-}
-func (m *PayloadFloatArr) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PayloadFloatArr.Unmarshal(m, b)
-}
-func (m *PayloadFloatArr) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PayloadFloatArr.Marshal(b, m, deterministic)
-}
-func (dst *PayloadFloatArr) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PayloadFloatArr.Merge(dst, src)
-}
-func (m *PayloadFloatArr) XXX_Size() int {
-	return xxx_messageInfo_PayloadFloatArr.Size(m)
-}
-func (m *PayloadFloatArr) XXX_DiscardUnknown() {
-	xxx_messageInfo_PayloadFloatArr.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_PayloadFloatArr proto.InternalMessageInfo
-
-func (m *PayloadFloatArr) GetValue() []float32 {
-	if m != nil {
-		return m.Value
-	}
-	return nil
-}
-
-type PayloadInt64Arr struct {
-	Value                []int64  `protobuf:"varint,1,rep,packed,name=Value,proto3" json:"Value,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *PayloadInt64Arr) Reset()         { *m = PayloadInt64Arr{} }
-func (m *PayloadInt64Arr) String() string { return proto.CompactTextString(m) }
-func (*PayloadInt64Arr) ProtoMessage()    {}
-func (*PayloadInt64Arr) Descriptor() ([]byte, []int) {
-	return fileDescriptor_payload_e75f9c78716bf7d8, []int{12}
-}
-func (m *PayloadInt64Arr) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PayloadInt64Arr.Unmarshal(m, b)
-}
-func (m *PayloadInt64Arr) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PayloadInt64Arr.Marshal(b, m, deterministic)
-}
-func (dst *PayloadInt64Arr) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PayloadInt64Arr.Merge(dst, src)
-}
-func (m *PayloadInt64Arr) XXX_Size() int {
-	return xxx_messageInfo_PayloadInt64Arr.Size(m)
-}
-func (m *PayloadInt64Arr) XXX_DiscardUnknown() {
-	xxx_messageInfo_PayloadInt64Arr.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_PayloadInt64Arr proto.InternalMessageInfo
-
-func (m *PayloadInt64Arr) GetValue() []int64 {
-	if m != nil {
-		return m.Value
-	}
-	return nil
-}
-
-type PayloadSint64Arr struct {
-	Value                []int64  `protobuf:"zigzag64,1,rep,packed,name=Value,proto3" json:"Value,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *PayloadSint64Arr) Reset()         { *m = PayloadSint64Arr{} }
-func (m *PayloadSint64Arr) String() string { return proto.CompactTextString(m) }
-func (*PayloadSint64Arr) ProtoMessage()    {}
-func (*PayloadSint64Arr) Descriptor() ([]byte, []int) {
-	return fileDescriptor_payload_e75f9c78716bf7d8, []int{13}
-}
-func (m *PayloadSint64Arr) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PayloadSint64Arr.Unmarshal(m, b)
-}
-func (m *PayloadSint64Arr) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PayloadSint64Arr.Marshal(b, m, deterministic)
-}
-func (dst *PayloadSint64Arr) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PayloadSint64Arr.Merge(dst, src)
-}
-func (m *PayloadSint64Arr) XXX_Size() int {
-	return xxx_messageInfo_PayloadSint64Arr.Size(m)
-}
-func (m *PayloadSint64Arr) XXX_DiscardUnknown() {
-	xxx_messageInfo_PayloadSint64Arr.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_PayloadSint64Arr proto.InternalMessageInfo
-
-func (m *PayloadSint64Arr) GetValue() []int64 {
-	if m != nil {
-		return m.Value
-	}
-	return nil
-}
-
-type PayloadUint64Arr struct {
-	Value                []uint64 `protobuf:"varint,1,rep,packed,name=Value,proto3" json:"Value,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *PayloadUint64Arr) Reset()         { *m = PayloadUint64Arr{} }
-func (m *PayloadUint64Arr) String() string { return proto.CompactTextString(m) }
-func (*PayloadUint64Arr) ProtoMessage()    {}
-func (*PayloadUint64Arr) Descriptor() ([]byte, []int) {
-	return fileDescriptor_payload_e75f9c78716bf7d8, []int{14}
-}
-func (m *PayloadUint64Arr) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PayloadUint64Arr.Unmarshal(m, b)
-}
-func (m *PayloadUint64Arr) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PayloadUint64Arr.Marshal(b, m, deterministic)
-}
-func (dst *PayloadUint64Arr) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PayloadUint64Arr.Merge(dst, src)
-}
-func (m *PayloadUint64Arr) XXX_Size() int {
-	return xxx_messageInfo_PayloadUint64Arr.Size(m)
-}
-func (m *PayloadUint64Arr) XXX_DiscardUnknown() {
-	xxx_messageInfo_PayloadUint64Arr.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_PayloadUint64Arr proto.InternalMessageInfo
-
-func (m *PayloadUint64Arr) GetValue() []uint64 {
-	if m != nil {
-		return m.Value
-	}
-	return nil
-}
-
-type PayloadBoolArr struct {
-	Value                []bool   `protobuf:"varint,1,rep,packed,name=Value,proto3" json:"Value,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *PayloadBoolArr) Reset()         { *m = PayloadBoolArr{} }
-func (m *PayloadBoolArr) String() string { return proto.CompactTextString(m) }
-func (*PayloadBoolArr) ProtoMessage()    {}
-func (*PayloadBoolArr) Descriptor() ([]byte, []int) {
-	return fileDescriptor_payload_e75f9c78716bf7d8, []int{15}
-}
-func (m *PayloadBoolArr) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PayloadBoolArr.Unmarshal(m, b)
-}
-func (m *PayloadBoolArr) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PayloadBoolArr.Marshal(b, m, deterministic)
-}
-func (dst *PayloadBoolArr) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PayloadBoolArr.Merge(dst, src)
-}
-func (m *PayloadBoolArr) XXX_Size() int {
-	return xxx_messageInfo_PayloadBoolArr.Size(m)
-}
-func (m *PayloadBoolArr) XXX_DiscardUnknown() {
-	xxx_messageInfo_PayloadBoolArr.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_PayloadBoolArr proto.InternalMessageInfo
-
-func (m *PayloadBoolArr) GetValue() []bool {
-	if m != nil {
-		return m.Value
-	}
-	return nil
-}
-
-type PayloadStringArr struct {
-	Value                []string `protobuf:"bytes,1,rep,name=Value,proto3" json:"Value,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *PayloadStringArr) Reset()         { *m = PayloadStringArr{} }
-func (m *PayloadStringArr) String() string { return proto.CompactTextString(m) }
-func (*PayloadStringArr) ProtoMessage()    {}
-func (*PayloadStringArr) Descriptor() ([]byte, []int) {
-	return fileDescriptor_payload_e75f9c78716bf7d8, []int{16}
-}
-func (m *PayloadStringArr) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PayloadStringArr.Unmarshal(m, b)
-}
-func (m *PayloadStringArr) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PayloadStringArr.Marshal(b, m, deterministic)
-}
-func (dst *PayloadStringArr) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PayloadStringArr.Merge(dst, src)
-}
-func (m *PayloadStringArr) XXX_Size() int {
-	return xxx_messageInfo_PayloadStringArr.Size(m)
-}
-func (m *PayloadStringArr) XXX_DiscardUnknown() {
-	xxx_messageInfo_PayloadStringArr.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_PayloadStringArr proto.InternalMessageInfo
-
-func (m *PayloadStringArr) GetValue() []string {
-	if m != nil {
-		return m.Value
-	}
-	return nil
-}
-
-type PayloadBytesArr struct {
-	Value                [][]byte `protobuf:"bytes,1,rep,name=Value,proto3" json:"Value,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *PayloadBytesArr) Reset()         { *m = PayloadBytesArr{} }
-func (m *PayloadBytesArr) String() string { return proto.CompactTextString(m) }
-func (*PayloadBytesArr) ProtoMessage()    {}
-func (*PayloadBytesArr) Descriptor() ([]byte, []int) {
-	return fileDescriptor_payload_e75f9c78716bf7d8, []int{17}
-}
-func (m *PayloadBytesArr) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PayloadBytesArr.Unmarshal(m, b)
-}
-func (m *PayloadBytesArr) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PayloadBytesArr.Marshal(b, m, deterministic)
-}
-func (dst *PayloadBytesArr) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PayloadBytesArr.Merge(dst, src)
-}
-func (m *PayloadBytesArr) XXX_Size() int {
-	return xxx_messageInfo_PayloadBytesArr.Size(m)
-}
-func (m *PayloadBytesArr) XXX_DiscardUnknown() {
-	xxx_messageInfo_PayloadBytesArr.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_PayloadBytesArr proto.InternalMessageInfo
-
-func (m *PayloadBytesArr) GetValue() [][]byte {
-	if m != nil {
-		return m.Value
-	}
-	return nil
-}
-
 func init() {
 	proto.RegisterType((*Meta)(nil), "schema.Meta")
 	proto.RegisterType((*Payload)(nil), "schema.Payload")
 	proto.RegisterMapType((map[uint64][]byte)(nil), "schema.Payload.ValuesEntry")
-	proto.RegisterType((*PayloadDouble)(nil), "schema.PayloadDouble")
-	proto.RegisterType((*PayloadFloat)(nil), "schema.PayloadFloat")
-	proto.RegisterType((*PayloadInt64)(nil), "schema.PayloadInt64")
 	proto.RegisterType((*PayloadSint64)(nil), "schema.PayloadSint64")
 	proto.RegisterType((*PayloadUint64)(nil), "schema.PayloadUint64")
 	proto.RegisterType((*PayloadBool)(nil), "schema.PayloadBool")
 	proto.RegisterType((*PayloadString)(nil), "schema.PayloadString")
 	proto.RegisterType((*PayloadBytes)(nil), "schema.PayloadBytes")
-	proto.RegisterType((*PayloadDoubleArr)(nil), "schema.PayloadDoubleArr")
-	proto.RegisterType((*PayloadFloatArr)(nil), "schema.PayloadFloatArr")
-	proto.RegisterType((*PayloadInt64Arr)(nil), "schema.PayloadInt64Arr")
-	proto.RegisterType((*PayloadSint64Arr)(nil), "schema.PayloadSint64Arr")
-	proto.RegisterType((*PayloadUint64Arr)(nil), "schema.PayloadUint64Arr")
-	proto.RegisterType((*PayloadBoolArr)(nil), "schema.PayloadBoolArr")
-	proto.RegisterType((*PayloadStringArr)(nil), "schema.PayloadStringArr")
-	proto.RegisterType((*PayloadBytesArr)(nil), "schema.PayloadBytesArr")
 }
 
-func init() { proto.RegisterFile("payload.proto", fileDescriptor_payload_e75f9c78716bf7d8) }
+func init() { proto.RegisterFile("payload.proto", fileDescriptor_payload_563679a0bb4d487b) }
 
-var fileDescriptor_payload_e75f9c78716bf7d8 = []byte{
-	// 401 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0xd3, 0xcf, 0x4b, 0xe3, 0x40,
-	0x14, 0x07, 0x70, 0xf2, 0x63, 0xfb, 0xe3, 0x25, 0xdd, 0x2d, 0xc3, 0x1e, 0x42, 0xf7, 0xb0, 0x21,
-	0xbb, 0x6a, 0x4e, 0x29, 0xb4, 0x22, 0xb5, 0x37, 0x8b, 0x0a, 0x1e, 0x44, 0x89, 0xd6, 0xfb, 0xb4,
-	0x19, 0x6b, 0x71, 0x92, 0x09, 0xc9, 0x54, 0xc8, 0x3f, 0xe2, 0xc5, 0x7f, 0x56, 0x3a, 0xc9, 0xd8,
-	0x84, 0x09, 0x78, 0xcb, 0xcc, 0x7c, 0xde, 0xbc, 0x79, 0x5f, 0x08, 0x0c, 0x52, 0x5c, 0x50, 0x86,
-	0xa3, 0x20, 0xcd, 0x18, 0x67, 0xa8, 0x93, 0xaf, 0x5f, 0x48, 0x8c, 0x47, 0x7f, 0x37, 0x8c, 0x6d,
-	0x28, 0x19, 0x8b, 0xdd, 0xd5, 0xee, 0x79, 0xcc, 0xb7, 0x31, 0xc9, 0x39, 0x8e, 0xd3, 0x12, 0x7a,
-	0xef, 0x1a, 0x98, 0xb7, 0x84, 0x63, 0x34, 0x83, 0xfe, 0x3a, 0x23, 0x98, 0x93, 0xe8, 0x2e, 0x71,
-	0x34, 0x57, 0xf3, 0xad, 0xc9, 0x28, 0x28, 0xab, 0x03, 0x59, 0x1d, 0x3c, 0xca, 0xea, 0xf0, 0x80,
-	0xd1, 0x1c, 0x80, 0xe2, 0x9c, 0x2f, 0xd3, 0x08, 0x73, 0xe2, 0xe8, 0xdf, 0x96, 0xd6, 0x34, 0x72,
-	0xa0, 0x1b, 0x11, 0x4a, 0x38, 0x89, 0x1c, 0xc3, 0xd5, 0xfc, 0x5e, 0x28, 0x97, 0xde, 0x87, 0x06,
-	0xdd, 0xfb, 0x72, 0x26, 0xe4, 0x82, 0x19, 0x13, 0x8e, 0xab, 0x67, 0xd9, 0x41, 0x39, 0x5c, 0xb0,
-	0x7f, 0x77, 0x28, 0x4e, 0xd0, 0x14, 0x3a, 0x6f, 0x98, 0xee, 0x48, 0xee, 0xe8, 0xae, 0xe1, 0x5b,
-	0x93, 0x3f, 0xd2, 0x54, 0x57, 0x04, 0x4f, 0xe2, 0xf4, 0x2a, 0xe1, 0x59, 0x11, 0x56, 0x74, 0x74,
-	0x0e, 0x56, 0x6d, 0x1b, 0x0d, 0xc1, 0x78, 0x25, 0x85, 0x68, 0x62, 0x86, 0xfb, 0x4f, 0xf4, 0x1b,
-	0x7e, 0x08, 0x2a, 0x86, 0xb2, 0xc3, 0x72, 0x31, 0xd7, 0x67, 0x9a, 0x77, 0x04, 0x83, 0xea, 0xe6,
-	0x4b, 0xb6, 0x5b, 0x51, 0xb2, 0xa7, 0xe2, 0x2e, 0x51, 0xae, 0x85, 0xe5, 0xc2, 0xfb, 0x0f, 0x76,
-	0xc5, 0xae, 0x29, 0xc3, 0xbc, 0xa9, 0x74, 0x55, 0xdd, 0x24, 0xfc, 0xec, 0xb4, 0xa9, 0x0c, 0xa9,
-	0x0e, 0x2d, 0x1f, 0xb6, 0x2a, 0x43, 0x2a, 0x5b, 0xb6, 0x30, 0x53, 0xb2, 0x7f, 0x60, 0x55, 0x6c,
-	0xc1, 0x18, 0x6d, 0xa2, 0x5e, 0x4b, 0x4b, 0x9e, 0x6d, 0x93, 0x4d, 0x93, 0xf5, 0xd5, 0xf7, 0x2f,
-	0x0a, 0x4e, 0xf2, 0xa6, 0xb2, 0xa5, 0xf2, 0x61, 0xd8, 0x88, 0xec, 0x22, 0xcb, 0xea, 0xd2, 0x38,
-	0xa4, 0x76, 0x02, 0xbf, 0xea, 0xa9, 0x29, 0x50, 0x57, 0xa1, 0x08, 0x4e, 0x81, 0x86, 0xda, 0xbb,
-	0xcc, 0x4e, 0x91, 0x48, 0x95, 0xcb, 0x76, 0xf9, 0x95, 0xe0, 0x31, 0xfc, 0xac, 0x25, 0xa8, 0xb8,
-	0x5e, 0x4b, 0x6f, 0x11, 0xa2, 0x22, 0xfb, 0xea, 0x38, 0x22, 0x47, 0x05, 0xca, 0x28, 0x57, 0x1d,
-	0xf1, 0x57, 0x4d, 0x3f, 0x03, 0x00, 0x00, 0xff, 0xff, 0x89, 0x6a, 0x8e, 0x19, 0xf5, 0x03, 0x00,
-	0x00,
+var fileDescriptor_payload_563679a0bb4d487b = []byte{
+	// 314 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0xd1, 0x4d, 0x4b, 0xf3, 0x40,
+	0x10, 0x07, 0x70, 0xd2, 0xe6, 0xe9, 0xcb, 0x24, 0x85, 0x87, 0xc5, 0x43, 0xa8, 0x07, 0x43, 0x55,
+	0xe8, 0x69, 0x0b, 0xad, 0x48, 0xed, 0x51, 0xf0, 0x28, 0xca, 0xd6, 0x7a, 0xdf, 0x36, 0x63, 0x2d,
+	0x26, 0xd9, 0x90, 0x4c, 0x85, 0x7c, 0x11, 0x2f, 0x7e, 0x59, 0xe9, 0xbe, 0x60, 0x83, 0x82, 0xb7,
+	0xce, 0xee, 0xef, 0xff, 0xef, 0x0e, 0x81, 0x41, 0x21, 0xeb, 0x54, 0xc9, 0x84, 0x17, 0xa5, 0x22,
+	0xc5, 0x3a, 0xd5, 0xe6, 0x15, 0x33, 0x39, 0x3c, 0xdb, 0x2a, 0xb5, 0x4d, 0x71, 0xa2, 0x4f, 0xd7,
+	0xfb, 0x97, 0x09, 0xed, 0x32, 0xac, 0x48, 0x66, 0x85, 0x81, 0xa3, 0x0f, 0x0f, 0xfc, 0x7b, 0x24,
+	0xc9, 0xe6, 0xd0, 0xdf, 0x94, 0x28, 0x09, 0x93, 0x87, 0x3c, 0xf2, 0x62, 0x6f, 0x1c, 0x4c, 0x87,
+	0xdc, 0xa4, 0xb9, 0x4b, 0xf3, 0x27, 0x97, 0x16, 0xdf, 0x98, 0x2d, 0x00, 0x52, 0x59, 0xd1, 0xaa,
+	0x48, 0x24, 0x61, 0xd4, 0xfa, 0x33, 0x7a, 0xa4, 0x59, 0x04, 0xdd, 0x04, 0x53, 0x24, 0x4c, 0xa2,
+	0x76, 0xec, 0x8d, 0x7b, 0xc2, 0x8d, 0xa3, 0x4f, 0x0f, 0xba, 0x8f, 0x66, 0x27, 0x16, 0x83, 0x9f,
+	0x21, 0x49, 0xfb, 0xac, 0x90, 0x9b, 0xe5, 0xf8, 0xe1, 0xdd, 0x42, 0xdf, 0xb0, 0x19, 0x74, 0xde,
+	0x65, 0xba, 0xc7, 0x2a, 0x6a, 0xc5, 0xed, 0x71, 0x30, 0x3d, 0x75, 0xc6, 0x56, 0xf0, 0x67, 0x7d,
+	0x7b, 0x97, 0x53, 0x59, 0x0b, 0x4b, 0x87, 0x37, 0x10, 0x1c, 0x1d, 0xb3, 0xff, 0xd0, 0x7e, 0xc3,
+	0x5a, 0xff, 0x89, 0x2f, 0x0e, 0x3f, 0xd9, 0x09, 0xfc, 0xd3, 0x54, 0x2f, 0x15, 0x0a, 0x33, 0x2c,
+	0x5a, 0x73, 0x6f, 0x74, 0x09, 0x03, 0xdb, 0xbc, 0xdc, 0xe5, 0x74, 0x7d, 0x75, 0xa0, 0xba, 0x4b,
+	0xc7, 0x99, 0x30, 0xc3, 0x11, 0x5b, 0xfd, 0xc2, 0x7c, 0xc7, 0xce, 0x21, 0xb0, 0xec, 0x56, 0xa9,
+	0xb4, 0x89, 0x7a, 0x3f, 0xbb, 0x96, 0x54, 0xee, 0xf2, 0x6d, 0x93, 0xf5, 0x1d, 0xbb, 0x80, 0xd0,
+	0x75, 0xd5, 0x84, 0x55, 0x53, 0x85, 0x56, 0xad, 0x3b, 0xfa, 0xbb, 0xcc, 0xbe, 0x02, 0x00, 0x00,
+	0xff, 0xff, 0x80, 0xef, 0xd5, 0xd4, 0x37, 0x02, 0x00, 0x00,
 }

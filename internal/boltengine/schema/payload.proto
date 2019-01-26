@@ -15,18 +15,6 @@ message Payload {
   map<uint64, bytes> values = 2;
 }
 
-message PayloadDouble {
-  double Value = 1;
-}
-
-message PayloadFloat {
-  float Value = 1;
-}
-
-message PayloadInt64 {
-  int64 Value = 1;
-}
-
 message PayloadSint64 {
   sint64 Value = 1;
 }
@@ -45,36 +33,4 @@ message PayloadString {
 
 message PayloadBytes {
   bytes Value = 1;
-}
-
-message PayloadDoubleArr {
-  repeated double Value = 1;
-}
-
-message PayloadFloatArr {
-  repeated float Value = 1;
-}
-
-message PayloadInt64Arr {
-  repeated int64 Value = 1;
-}
-
-message PayloadSint64Arr {
-  repeated sint64 Value = 1;
-}
-
-message PayloadUint64Arr {
-  repeated uint64 Value = 1;
-}
-
-message PayloadBoolArr {
-  repeated bool Value = 1;
-}
-
-message PayloadStringArr {
-  repeated string Value = 1;
-}
-
-message PayloadBytesArr {
-  repeated bytes Value = 1;
 }
