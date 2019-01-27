@@ -60,7 +60,7 @@ type Partition interface {
 	// If you provide the id, it means that the data is already existed,
 	// otherwise just leave it and it will be treated as a new data.
 	Get(id ...string) (SetTx, error)
-	One(propName string, value interface{}) (SetTx, error)
+	One(propName string, value string) (SetTx, error)
 }
 
 type SetTx interface {

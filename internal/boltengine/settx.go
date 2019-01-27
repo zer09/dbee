@@ -148,8 +148,7 @@ func (sx *SetTx) indexString(tx *bolt.Tx) error {
 		return nil
 	}
 
-	b := tx.Bucket(indexBucket)
-	sb := b.Bucket(indexStringBucket)
+	sb := tx.Bucket(indexBucket).Bucket(indexStringBucket)
 
 	for k, v := range sx.indexableString {
 		kb, err := sb.CreateBucketIfNotExists(endian.I64toB(k))
@@ -176,8 +175,7 @@ func (sx *SetTx) indexUint(tx *bolt.Tx) error {
 		return nil
 	}
 
-	b := tx.Bucket(indexBucket)
-	ub := b.Bucket(indexUintBucket)
+	ub := tx.Bucket(indexBucket).Bucket(indexUintBucket)
 
 	for k, v := range sx.indexableUint {
 		kb, err := ub.CreateBucketIfNotExists(endian.I64toB(k))
@@ -204,8 +202,7 @@ func (sx *SetTx) indexNint(tx *bolt.Tx) error {
 		return nil
 	}
 
-	b := tx.Bucket(indexBucket)
-	nb := b.Bucket(indexNintBucket)
+	nb := tx.Bucket(indexBucket).Bucket(indexNintBucket)
 
 	for k, v := range sx.indexableNint {
 		kb, err := nb.CreateBucketIfNotExists(endian.I64toB(k))

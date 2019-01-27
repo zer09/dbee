@@ -2,6 +2,7 @@ package boltengine
 
 import (
 	"dbee/internal/boltengine/schema"
+	"strings"
 )
 
 func (sx *SetTx) Wint(n string, v int64) {
@@ -52,7 +53,7 @@ func (sx *SetTx) Wstring(n string, v string) {
 		sx.indexableString = make(map[uint64]string)
 	}
 
-	sx.indexableString[pn] = v
+	sx.indexableString[pn] = strings.ToLower(strings.TrimSpace(v))
 }
 
 func (sx *SetTx) Wbool(n string, v bool) {
